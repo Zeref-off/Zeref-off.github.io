@@ -5,38 +5,11 @@ body{
     font-family:Arial;
 }
 
-/* Contenedor principal (para absorber todo) */
-#page{
+/* Canvas Matrix */
+#matrix{
     position:fixed;
     width:100%;
     height:100%;
-}
-
-/* Cascada */
-#cascade{
-    position:absolute;
-    width:100%;
-    height:100%;
-    display:flex;
-    justify-content:space-around;
-    overflow:hidden;
-}
-
-.column{
-    position:relative;
-    color:#ff4d7a;
-    font-size:22px;
-    line-height:22px;
-    writing-mode:vertical-rl;
-    text-orientation:upright;
-}
-
-/* Ventana visible (clave del efecto) */
-.window{
-    position:absolute;
-    width:100%;
-    height:120px;
-    overflow:hidden;
 }
 
 /* Botón */
@@ -56,11 +29,19 @@ body{
     z-index:10;
 }
 
-/* Agujero / gota */
+/* Contenedor para espiral */
+#page{
+    position:fixed;
+    width:100%;
+    height:100%;
+    transform-origin:center;
+}
+
+/* Punto / gota */
 #singularity{
     position:fixed;
-    width:20px;
-    height:20px;
+    width:18px;
+    height:18px;
     background:red;
     border-radius:50%;
     top:50%;
@@ -80,24 +61,6 @@ body{
     opacity:0;
 }
 
-/* Ondas */
-.ripple{
-    position:absolute;
-    left:50%;
-    bottom:20%;
-    width:10px;
-    height:10px;
-    border:2px solid #ff4d7a;
-    border-radius:50%;
-    transform:translateX(-50%);
-    animation:ripple 3s ease-out forwards;
-}
-
-@keyframes ripple{
-    0%{width:10px;height:10px;opacity:1;}
-    100%{width:500px;height:500px;opacity:0;}
-}
-
 /* Árbol */
 #tree{
     position:fixed;
@@ -106,11 +69,11 @@ body{
     transform:translateX(-50%);
 }
 
-#trunk{
-    width:12px;
-    height:0;
+/* Ramas */
+.branch{
+    position:absolute;
     background:#4a2c2c;
-    transition:height 5s ease;
+    transform-origin:bottom;
 }
 
 /* Hojas */
@@ -124,18 +87,20 @@ body{
 }
 
 @keyframes fall{
-    0%{transform:translateY(0);}
-    100%{transform:translateY(600px) translateX(80px);}
+    0%{transform:translateY(0) translateX(0);}
+    50%{transform:translateY(300px) translateX(-40px);}
+    100%{transform:translateY(600px) translateX(40px);}
 }
 
 /* Poemas */
 .poem{
     position:fixed;
-    top:20%;
+    top:15%;
     width:25%;
     color:#ffb6c1;
     font-size:18px;
     opacity:0;
+    line-height:1.6;
 }
 
 #poemLeft{left:5%;}
@@ -149,4 +114,5 @@ body{
     color:white;
     opacity:0;
 }
+
 
