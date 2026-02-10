@@ -2,23 +2,19 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>San Valentín</title>
+<title>Para Ti ❤️</title>
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-<div id="page">
+<canvas id="matrix"></canvas>
+<div id="startBox">INICIAR</div>
 
-    <canvas id="matrix"></canvas>
-
-    <div id="startBox">INICIAR</div>
-
-</div>
-
+<div id="page"></div>
 <div id="singularity"></div>
 
-<div id="water"></div>
-<div id="tree"></div>
+<canvas id="waterCanvas"></canvas>
+<canvas id="treeCanvas"></canvas>
 
 <div id="poemLeft" class="poem"></div>
 <div id="poemRight" class="poem"></div>
@@ -28,9 +24,12 @@ Mi amor por ti comenzó hace...<br>
 <span id="time"></span>
 </div>
 
+<audio id="music" loop>
+<source src="music.mp3" type="audio/mpeg">
+</audio>
+
 <script src="script.js"></script>
 </body>
 </html>
-
 
 
