@@ -7,19 +7,21 @@
 </head>
 <body>
 
-<div id="scene">
+<!-- ================= PRIMERA PANTALLA ================= -->
+<div id="startScreen">
+    <canvas id="matrixCanvas"></canvas>
+    <div id="startBox">INICIAR</div>
+</div>
 
-    <!-- Árbol -->
+<!-- ================= ESCENA PRINCIPAL ================= -->
+<div id="scene" class="hidden">
+
     <canvas id="treeCanvas"></canvas>
-
-    <!-- Nieve -->
     <canvas id="snowCanvas"></canvas>
 
-    <!-- Poemas -->
     <div id="poemLeft" class="poem"></div>
     <div id="poemRight" class="poem"></div>
 
-    <!-- Contador -->
     <div id="counterBox">
         <div>Mi amor por ti empezó hace...</div>
         <div id="counter"></div>
@@ -30,4 +32,3 @@
 <script src="script.js"></script>
 </body>
 </html>
-
