@@ -1,4 +1,4 @@
-/* ===== MATRIX TE AMO (vertical tipo Matrix) ===== */
+/* ========= MATRIX TE AMO ========= */
 
 const canvas = document.getElementById("matrix");
 const ctx = canvas.getContext("2d");
@@ -9,14 +9,10 @@ canvas.height = window.innerHeight;
 const letters = ["T","E","A","M","O"];
 const fontSize = 18;
 const columns = canvas.width / fontSize;
-const drops = [];
-
-for(let i=0;i<columns;i++){
-    drops[i] = Math.random()*canvas.height;
-}
+const drops = Array(Math.floor(columns)).fill(0);
 
 function drawMatrix(){
-    ctx.fillStyle="rgba(0,0,0,0.08)";
+    ctx.fillStyle="rgba(0,0,0,0.07)";
     ctx.fillRect(0,0,canvas.width,canvas.height);
 
     ctx.fillStyle="#ff4d7a";
@@ -26,45 +22,47 @@ function drawMatrix(){
         const text = letters[Math.floor(Math.random()*letters.length)];
         ctx.fillText(text, i*fontSize, drops[i]*fontSize);
 
-        if(drops[i]*fontSize > canvas.height && Math.random()>0.975){
+        if(drops[i]*fontSize > canvas.height && Math.random()>0.97){
             drops[i]=0;
         }
-
         drops[i]+=0.6;
     }
 }
 
-let matrixInterval = setInterval(drawMatrix,33);
+let matrixInterval = setInterval(drawMatrix,30);
 
 
-/* ===== ESPIRAL DE ABSORCIÓN ===== */
+/* ========= INICIO ========= */
 
 const startBox = document.getElementById("startBox");
-const page = document.getElementById("page");
 const singularity = document.getElementById("singularity");
+const music = document.getElementById("music");
 
 startBox.onclick = ()=>{
     startBox.style.display="none";
+    music.volume = 0.5;
+    music.play().catch(()=>{});
+
     clearInterval(matrixInterval);
 
-    let scale = 1;
-    let rotate = 0;
+    let scale=1;
+    let rotate=0;
 
-    const spiral = setInterval(()=>{
-        scale -= 0.02;
-        rotate += 10;
-        page.style.transform = `scale(${scale}) rotate(${rotate}deg)`;
+    const spiral=setInterval(()=>{
+        scale-=0.02;
+        rotate+=12;
+        canvas.style.transform=`scale(${scale}) rotate(${rotate}deg)`;
 
-        if(scale <= 0.05){
+        if(scale<=0.05){
             clearInterval(spiral);
-            page.style.display="none";
+            canvas.style.display="none";
             createDrop();
         }
     },30);
 };
 
 
-/* ===== GOTA ===== */
+/* ========= GOTA ========= */
 
 function createDrop(){
     singularity.style.display="block";
@@ -72,125 +70,127 @@ function createDrop(){
     singularity.style.width="12px";
     singularity.style.height="18px";
     singularity.style.borderRadius="50% 50% 60% 60%";
-    singularity.style.top="85%";
+    singularity.style.top="80%";
 
-    setTimeout(afterImpact,2000);
+    setTimeout(startWater,2000);
 }
 
 
-/* ===== IMPACTO ===== */
+/* ========= AGUA CINEMÁTICA ========= */
 
-function afterImpact(){
-    document.getElementById("water").style.opacity=1;
-    growTree();
+const waterCanvas=document.getElementById("waterCanvas");
+const wctx=waterCanvas.getContext("2d");
+
+waterCanvas.width=window.innerWidth;
+waterCanvas.height=window.innerHeight*0.4;
+
+let ripples=[];
+
+function startWater(){
+    waterCanvas.style.opacity=1;
+    ripples.push({x:waterCanvas.width/2,y:50,r:10,alpha:1});
+    animateWater();
+    setTimeout(growTree,2000);
+}
+
+function animateWater(){
+    wctx.clearRect(0,0,waterCanvas.width,waterCanvas.height);
+    ripples.forEach(r=>{
+        wctx.beginPath();
+        wctx.arc(r.x,r.y,r.r,0,Math.PI*2);
+        wctx.strokeStyle=`rgba(255,80,120,${r.alpha})`;
+        wctx.stroke();
+        r.r+=2;
+        r.alpha-=0.01;
+    });
+    ripples=ripples.filter(r=>r.alpha>0);
+    requestAnimationFrame(animateWater);
 }
 
 
-/* ===== ÁRBOL CON RAMAS ===== */
+/* ========= ÁRBOL SAKURA ========= */
 
-function createBranch(x,y,length,angle,depth){
+const treeCanvas=document.getElementById("treeCanvas");
+const tctx=treeCanvas.getContext("2d");
+treeCanvas.width=window.innerWidth;
+treeCanvas.height=window.innerHeight;
+
+function drawBranch(x,y,len,angle,depth){
     if(depth===0) return;
 
-    const branch = document.createElement("div");
-    branch.className="branch";
-    branch.style.height = length+"px";
-    branch.style.width = "6px";
-    branch.style.left = x+"px";
-    branch.style.bottom = y+"px";
-    branch.style.transform = `rotate(${angle}deg)`;
-    document.getElementById("tree").appendChild(branch);
+    const x2=x+Math.cos(angle)*len;
+    const y2=y-Math.sin(angle)*len;
+
+    tctx.beginPath();
+    tctx.moveTo(x,y);
+    tctx.lineTo(x2,y2);
+    tctx.strokeStyle="#4a2c2c";
+    tctx.lineWidth=depth;
+    tctx.stroke();
 
     setTimeout(()=>{
-        const rad = angle*Math.PI/180;
-        const nx = x + Math.sin(rad)*length;
-        const ny = y + Math.cos(rad)*length;
-
-        createBranch(nx,ny,length*0.7,angle-25,depth-1);
-        createBranch(nx,ny,length*0.7,angle+25,depth-1);
-
-        if(depth===1){
-            createLeaf(nx,ny);
-        }
-    },500);
+        drawBranch(x2,y2,len*0.75,angle-0.4,depth-1);
+        drawBranch(x2,y2,len*0.75,angle+0.4,depth-1);
+        if(depth<3) createPetal(x2,y2);
+    },300);
 }
 
 function growTree(){
-    createBranch(0,0,200,0,6);
-
-    setTimeout(startLeaves,6000);
-    setTimeout(showPoemLeft,7000);
-}
-
-function createLeaf(x,y){
-    const leaf = document.createElement("div");
-    leaf.className="leaf";
-    leaf.style.left=x+"px";
-    leaf.style.bottom=y+"px";
-    document.getElementById("tree").appendChild(leaf);
-}
-
-function startLeaves(){
-    for(let i=0;i<40;i++){
-        const leaf = document.createElement("div");
-        leaf.className="leaf";
-        leaf.style.left=(Math.random()*200-100)+"px";
-        leaf.style.bottom="400px";
-        leaf.style.animationDelay=Math.random()*8+"s";
-        document.getElementById("tree").appendChild(leaf);
-    }
+    drawBranch(treeCanvas.width/2,treeCanvas.height*0.8,120,Math.PI/2,10);
+    setTimeout(startPetalFall,4000);
+    setTimeout(showPoemLeft,5000);
 }
 
 
-/* ===== POEMAS LARGOS ===== */
+/* ========= PÉTALOS CON VIENTO ========= */
 
-const poem1 = `Desde el instante en que llegaste a mi vida,
-el mundo cambió su forma de girar.
-Las horas comenzaron a tener tu nombre,
-y el tiempo aprendió a esperarte.
+let petals=[];
 
-Tu sonrisa se volvió mi refugio,
-tu voz, la calma de mis días,
-y en cada latido descubrí
-que el amor no era un sueño,
-sino una realidad que respiraba en ti.
+function createPetal(x,y){
+    petals.push({x,y,vy:1,vx:Math.random()*2-1});
+}
 
-Si el destino existe,
-sé que escribió tu nombre
-mucho antes de que yo pudiera pronunciarlo.`;
+function startPetalFall(){
+    setInterval(()=>{
+        petals.forEach(p=>{
+            p.y+=p.vy;
+            p.x+=Math.sin(Date.now()/500)*0.5;
+            tctx.fillStyle="pink";
+            tctx.fillRect(p.x,p.y,4,4);
+        });
+    },30);
+}
 
-const poem2 = `Hoy entiendo que amarte
-no es solo sentir,
-es elegirte cada día
-en cada pensamiento y en cada silencio.
 
-Porque en tus ojos encontré hogar,
-en tus abrazos, mi lugar,
-y en tu presencia
-la certeza de que la vida
-puede ser tan hermosa
-como siempre la imaginé.
+/* ========= POEMAS ========= */
 
-Y si el tiempo intentara separarnos,
-volvería a buscarte,
-una y otra vez,
-en cada vida que me toque vivir.`;
+const poem1=`Desde el instante en que apareciste,
+mi mundo cambió sin aviso...
+(extendido romántico largo)
+Porque amarte
+se volvió mi forma favorita de existir.`;
 
+const poem2=`Si el destino tuviera voz,
+diría tu nombre...
+(otro poema largo)
+Y en cada vida,
+volvería a encontrarte.`;
 
 function typeText(el,text,callback){
     el.style.opacity=1;
     let i=0;
     const interval=setInterval(()=>{
-        el.innerHTML += text[i];
+        el.innerHTML+=text[i];
         i++;
         if(i>=text.length){
             clearInterval(interval);
             setTimeout(()=>{
                 el.style.opacity=0;
                 el.innerHTML="";
-                if(callback) callback();
+                callback();
             },4000);
         }
-    },35);
+    },30);
 }
 
 function showPoemLeft(){
@@ -202,7 +202,7 @@ function showPoemRight(){
 }
 
 
-/* ===== CONTADOR ===== */
+/* ========= CONTADOR ========= */
 
 let d=30,h=14,m=5,s=10;
 const timeEl=document.getElementById("time");
@@ -214,27 +214,22 @@ function update(){
     if(m<0){m=59;h--;}
     if(h<0){h=23;d--;}
     if(d<0){d=0;}
-
     timeEl.textContent=`${d} días ${h} horas ${m} minutos ${s} segundos`;
 }
-
 setInterval(update,1000);
 
 function startCounter(){
     counter.style.opacity=1;
-
     const fast=setInterval(()=>{
         s-=5;
         if(s<=0){
             d=0;h=0;m=0;s=0;
             update();
             clearInterval(fast);
-
             setTimeout(()=>{
                 window.location.href="final.html";
             },5000);
         }
     },100);
 }
-
 
