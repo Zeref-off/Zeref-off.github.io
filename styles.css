@@ -6,7 +6,7 @@
     font-family: 'Segoe UI', sans-serif;
 }
 
-/* Configuración general */
+/* General */
 body{
     background:black;
     overflow:hidden;
@@ -20,7 +20,7 @@ body{
     height:100vh;
 }
 
-/* Cascada de TE AMO */
+/* Cascada */
 .cascada{
     position:absolute;
     top:0;
@@ -32,24 +32,27 @@ body{
     pointer-events:none;
 }
 
+/* Columnas */
 .columna{
     display:flex;
     flex-direction:column;
+    align-items:center;
     animation: caer linear infinite;
 }
 
-.columna span{
-    color:#ff4d6d; /* rojo rosado */
+/* Letras */
+.letra{
+    color:#ff4d6d;
     font-size:22px;
-    margin:10px 0;
+    margin:4px 0;
     opacity:0;
-    animation: aparecer 3s infinite;
+    animation: aparecer 4s infinite;
 }
 
-/* Animaciones */
+/* Animaciones (más lentas) */
 @keyframes caer{
-    0%{ transform: translateY(-100%); }
-    100%{ transform: translateY(100%); }
+    0%{ transform: translateY(-120%); }
+    100%{ transform: translateY(120%); }
 }
 
 @keyframes aparecer{
@@ -57,7 +60,7 @@ body{
     50%{ opacity:0.8; }
 }
 
-/* Cuadro central */
+/* Cuadro central (transparente) */
 #cuadro-iniciar{
     position:absolute;
     top:50%;
@@ -65,6 +68,7 @@ body{
     transform:translate(-50%, -50%);
     width:260px;
     height:140px;
+    background:transparent; /* sin fondo */
     border-radius:20px;
     display:flex;
     justify-content:center;
@@ -79,6 +83,7 @@ body{
         0 0 40px #ff003c;
 }
 
+/* Texto del botón */
 #cuadro-iniciar h1{
     color:#ff003c;
     letter-spacing:3px;
@@ -95,5 +100,4 @@ body{
     align-items:center;
     font-size:32px;
 }
-
 
