@@ -1,193 +1,138 @@
-/* ---------- CASCADA TE AMO ---------- */
+// ===== CASCADA REAL =====
+const cascade = document.getElementById("cascade");
 
-const cascada = document.getElementById("cascada");
-const letras = ["T","E","A","M","O"];
-
-for(let i=0;i<18;i++){
-    let col=document.createElement("div");
-    col.className="columna";
-    col.style.animationDuration=(10+Math.random()*6)+"s";
-
-    for(let j=0;j<12;j++){
-        letras.forEach(l=>{
-            let s=document.createElement("span");
-            s.className="letra";
-            s.textContent=l;
-            col.appendChild(s);
-        });
-    }
-    cascada.appendChild(col);
+function createColumn(){
+    const col = document.createElement("div");
+    col.className="column";
+    col.innerHTML="T<br>E<br>A<br>M<br>O";
+    col.style.animationDuration = (6 + Math.random()*6) + "s";
+    col.style.animationDelay = Math.random()*5 + "s";
+    cascade.appendChild(col);
 }
 
-/* ---------- INICIAR (AGUJERO NEGRO) ---------- */
+for(let i=0;i<30;i++){
+    createColumn();
+}
 
-document.getElementById("cuadro-iniciar").onclick=()=>{
+// ===== INICIAR =====
+const startBox = document.getElementById("startBox");
+const singularity = document.getElementById("singularity");
 
-    const inicio=document.getElementById("pantalla-inicio");
-    inicio.style.transform="scale(0)";
-    inicio.style.opacity="0";
-
-    setTimeout(()=>{
-        inicio.style.display="none";
-        document.getElementById("escena").style.display="block";
-        iniciarGota();
-    },1200);
+startBox.onclick = ()=>{
+    startBox.style.display="none";
+    cascade.style.transition="transform 1s";
+    cascade.style.transform="scale(0)";
+    
+    singularity.style.display="block";
+    
+    setTimeout(dropAnimation,1200);
 };
 
-/* ---------- GOTA ---------- */
-
-function iniciarGota(){
-    const gota=document.getElementById("gota");
-    gota.style.display="block";
-
-    setTimeout(()=>{
-        gota.classList.add("caer");
-    },100);
-
-    setTimeout(crearOndas,2600);
+// ===== GOTA =====
+function dropAnimation(){
+    singularity.style.transition="all 2s ease";
+    singularity.style.top="85%";
+    singularity.style.width="12px";
+    singularity.style.height="18px";
+    singularity.style.borderRadius="50% 50% 60% 60%";
+    
+    setTimeout(afterDrop,2000);
 }
 
-/* ---------- ONDAS ---------- */
+// ===== DESPUES DEL IMPACTO =====
+function afterDrop(){
+    document.getElementById("water").style.opacity=1;
+    
+    // Ondas
+    document.querySelectorAll(".ripple").forEach((r,i)=>{
+        r.style.animationDelay = i*0.5 + "s";
+        r.style.opacity=1;
+    });
+    
+    setTimeout(growTree,3000);
+}
 
-function crearOndas(){
-    const canvas=document.getElementById("ondas");
-    const ctx=canvas.getContext("2d");
-
-    canvas.width=window.innerWidth;
-    canvas.height=window.innerHeight;
-
-    let r=0;
-    const x=canvas.width/2;
-    const y=canvas.height*0.85;
-
-    function anim(){
-        ctx.clearRect(0,0,canvas.width,canvas.height);
-
-        ctx.strokeStyle="rgba(200,200,255,0.5)";
-        ctx.lineWidth=2;
-
-        for(let i=0;i<4;i++){
-            ctx.beginPath();
-            ctx.arc(x,y,r-i*30,0,Math.PI*2);
-            ctx.stroke();
-        }
-
-        r+=2;
-
-        if(r<180){
-            requestAnimationFrame(anim);
-        }else{
-            setTimeout(iniciarArbol,500);
-        }
+// ===== CRECIMIENTO DEL ARBOL =====
+function growTree(){
+    const trunk = document.getElementById("trunk");
+    trunk.style.height="400px";
+    
+    // ramas simuladas
+    for(let i=0;i<40;i++){
+        const leaf = document.createElement("div");
+        leaf.className="leaf";
+        leaf.style.left = (Math.random()*200-100) + "px";
+        leaf.style.top = (Math.random()*400) + "px";
+        leaf.style.animationDelay = Math.random()*6 + "s";
+        document.getElementById("tree").appendChild(leaf);
     }
-
-    anim();
+    
+    setTimeout(showPoems,4000);
 }
 
-/* ---------- ARBOL ---------- */
+// ===== POEMAS =====
+const poem1 = `Eres la calma en mi tormenta,
+la luz en mi oscuridad.
+Cada momento contigo
+se convierte en eternidad.`;
 
-function iniciarArbol(){
-    const canvas=document.getElementById("arbolCanvas");
-    const ctx=canvas.getContext("2d");
+const poem2 = `Si el tiempo se detuviera,
+solo pediría una cosa:
+seguir mirándote,
+mi amor, mi vida hermosa.`;
 
-    canvas.width=window.innerWidth;
-    canvas.height=window.innerHeight;
-
-    function rama(x,y,l,a,g){
-        if(l<8) return;
-
-        const x2=x+Math.cos(a)*l;
-        const y2=y+Math.sin(a)*l;
-
-        ctx.beginPath();
-        ctx.moveTo(x,y);
-        ctx.lineTo(x2,y2);
-        ctx.lineWidth=g;
-        ctx.strokeStyle="#3b1f0f";
-        ctx.stroke();
-
-        if(l<25){
-            ctx.beginPath();
-            ctx.arc(x2,y2,3,0,Math.PI*2);
-            ctx.fillStyle="#ffb6c1";
-            ctx.fill();
-        }
-
-        rama(x2,y2,l*0.7,a-0.4,g*0.7);
-        rama(x2,y2,l*0.7,a+0.4,g*0.7);
-    }
-
-    rama(canvas.width/2,canvas.height*0.85,130,-Math.PI/2,8);
-
-    mostrarPoemaIzq();
-}
-
-/* ---------- POEMAS ---------- */
-
-const poema1=`Desde que llegaste a mi vida,
-todo empezó a tener sentido.
-Mi mundo cambió sin avisar,
-y mi corazón te hizo su destino.
-`;
-
-const poema2=`No importa el tiempo ni la distancia,
-ni los días que vendrán.
-Si tengo tu amor conmigo,
-lo tengo todo en realidad.
-`;
-
-function escribir(el,texto,vel,cb){
-    el.style.opacity=1;
+function typeText(element,text,callback){
     let i=0;
-    function t(){
-        if(i<texto.length){
-            el.innerHTML+=texto[i++];
-            setTimeout(t,vel);
-        }else if(cb) cb();
-    }
-    t();
-}
-
-function mostrarPoemaIzq(){
-    escribir(document.getElementById("poema-izq"),poema1,30,mostrarPoemaDer);
-}
-
-function mostrarPoemaDer(){
-    escribir(document.getElementById("poema-der"),poema2,30,iniciarContador);
-}
-
-/* ---------- CONTADOR ---------- */
-
-let total=30*86400+14*3600+5*60+10;
-const tiempoEl=document.getElementById("tiempo");
-
-function iniciarContador(){
-    document.getElementById("contador").style.opacity=1;
-
-    let normal=true;
-
-    const int=setInterval(()=>{
-        total-=normal?1:50;
-        if(total<0) total=0;
-
-        let d=Math.floor(total/86400);
-        let h=Math.floor((total%86400)/3600);
-        let m=Math.floor((total%3600)/60);
-        let s=total%60;
-
-        tiempoEl.textContent=`${d} días ${h} horas ${m} minutos ${s} segundos`;
-
-        if(total<2000) normal=false;
-
-        if(total===0){
-            clearInterval(int);
-            setTimeout(()=>{
-                document.getElementById("escena").style.display="none";
-                document.getElementById("final").style.display="flex";
-            },1500);
+    element.style.opacity=1;
+    const interval = setInterval(()=>{
+        element.innerHTML += text[i];
+        i++;
+        if(i>=text.length){
+            clearInterval(interval);
+            if(callback) callback();
         }
+    },40);
+}
 
-    },1000);
+function showPoems(){
+    const left = document.getElementById("poemLeft");
+    const right = document.getElementById("poemRight");
+    const counter = document.getElementById("counter");
+    
+    typeText(left,poem1,()=>{
+        typeText(right,poem2,()=>{
+            counter.style.opacity=1;
+            accelerateCounter();
+        });
+    });
+}
+
+// ===== CONTADOR =====
+let days=30, hours=14, minutes=5, seconds=10;
+const timeEl = document.getElementById("time");
+
+function updateTime(){
+    seconds--;
+    if(seconds<0){seconds=59;minutes--;}
+    if(minutes<0){minutes=59;hours--;}
+    if(hours<0){hours=23;days--;}
+    if(days<0){days=0;hours=0;minutes=0;seconds=0;}
+    
+    timeEl.textContent=`${days} días ${hours} horas ${minutes} minutos ${seconds} segundos`;
+}
+
+setInterval(updateTime,1000);
+
+// Aceleración final
+function accelerateCounter(){
+    const fast = setInterval(()=>{
+        seconds-=5;
+        if(seconds<=0){
+            days=0;hours=0;minutes=0;seconds=0;
+            updateTime();
+            clearInterval(fast);
+        }
+    },100);
 }
 
 
