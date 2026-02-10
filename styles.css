@@ -43,7 +43,7 @@ body{
 /* Letras */
 .letra{
     color:#ff4d6d;
-    font-size:20px;
+    font-size:18px;
     margin:4px 0;
     opacity:0;
     animation: aparecer 4s infinite;
@@ -66,8 +66,8 @@ body{
     top:50%;
     left:50%;
     transform:translate(-50%, -50%);
-    width:240px;
-    height:120px;
+    width:220px;
+    height:100px;
     background:transparent; /* sin fondo */
     border-radius:20px;
     display:flex;
@@ -100,5 +100,6 @@ body{
     align-items:center;
     font-size:32px;
 }
+
 
 
