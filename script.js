@@ -1,34 +1,43 @@
-const cascade = document.getElementById("cascade");
+/* ===== MATRIX TE AMO (vertical tipo Matrix) ===== */
 
-/* ===== CASCADA REAL POR VENTANA ===== */
+const canvas = document.getElementById("matrix");
+const ctx = canvas.getContext("2d");
 
-function createColumn(){
-    const col = document.createElement("div");
-    col.className="column";
-    col.innerHTML="T<br>E<br>A<br>M<br>O<br>".repeat(10);
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 
-    const windowDiv = document.createElement("div");
-    windowDiv.className="window";
-    windowDiv.appendChild(col);
+const letters = ["T","E","A","M","O"];
+const fontSize = 18;
+const columns = canvas.width / fontSize;
+const drops = [];
 
-    cascade.appendChild(windowDiv);
-
-    let pos = Math.random()*window.innerHeight;
-
-    const speed = 0.3 + Math.random()*0.5;
-
-    setInterval(()=>{
-        pos += speed;
-        if(pos > window.innerHeight) pos = -150;
-        windowDiv.style.top = pos+"px";
-    },20);
+for(let i=0;i<columns;i++){
+    drops[i] = Math.random()*canvas.height;
 }
 
-for(let i=0;i<30;i++){
-    createColumn();
+function drawMatrix(){
+    ctx.fillStyle="rgba(0,0,0,0.08)";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    ctx.fillStyle="#ff4d7a";
+    ctx.font=fontSize+"px monospace";
+
+    for(let i=0;i<drops.length;i++){
+        const text = letters[Math.floor(Math.random()*letters.length)];
+        ctx.fillText(text, i*fontSize, drops[i]*fontSize);
+
+        if(drops[i]*fontSize > canvas.height && Math.random()>0.975){
+            drops[i]=0;
+        }
+
+        drops[i]+=0.6;
+    }
 }
 
-/* ===== TRANSICIÓN ===== */
+let matrixInterval = setInterval(drawMatrix,33);
+
+
+/* ===== ESPIRAL DE ABSORCIÓN ===== */
 
 const startBox = document.getElementById("startBox");
 const page = document.getElementById("page");
@@ -36,18 +45,29 @@ const singularity = document.getElementById("singularity");
 
 startBox.onclick = ()=>{
     startBox.style.display="none";
+    clearInterval(matrixInterval);
 
-    page.style.transition="transform 1s ease";
-    page.style.transform="scale(0)";
+    let scale = 1;
+    let rotate = 0;
 
-    singularity.style.display="block";
+    const spiral = setInterval(()=>{
+        scale -= 0.02;
+        rotate += 10;
+        page.style.transform = `scale(${scale}) rotate(${rotate}deg)`;
 
-    setTimeout(drop,1200);
+        if(scale <= 0.05){
+            clearInterval(spiral);
+            page.style.display="none";
+            createDrop();
+        }
+    },30);
 };
+
 
 /* ===== GOTA ===== */
 
-function drop(){
+function createDrop(){
+    singularity.style.display="block";
     singularity.style.transition="all 2s ease";
     singularity.style.width="12px";
     singularity.style.height="18px";
@@ -57,83 +77,136 @@ function drop(){
     setTimeout(afterImpact,2000);
 }
 
+
 /* ===== IMPACTO ===== */
 
 function afterImpact(){
-    const water = document.getElementById("water");
-    water.style.opacity=1;
-
-    for(let i=0;i<3;i++){
-        const r = document.createElement("div");
-        r.className="ripple";
-        r.style.animationDelay = (i*0.5)+"s";
-        document.body.appendChild(r);
-    }
-
-    setTimeout(growTree,3000);
+    document.getElementById("water").style.opacity=1;
+    growTree();
 }
 
-/* ===== ÁRBOL ===== */
+
+/* ===== ÁRBOL CON RAMAS ===== */
+
+function createBranch(x,y,length,angle,depth){
+    if(depth===0) return;
+
+    const branch = document.createElement("div");
+    branch.className="branch";
+    branch.style.height = length+"px";
+    branch.style.width = "6px";
+    branch.style.left = x+"px";
+    branch.style.bottom = y+"px";
+    branch.style.transform = `rotate(${angle}deg)`;
+    document.getElementById("tree").appendChild(branch);
+
+    setTimeout(()=>{
+        const rad = angle*Math.PI/180;
+        const nx = x + Math.sin(rad)*length;
+        const ny = y + Math.cos(rad)*length;
+
+        createBranch(nx,ny,length*0.7,angle-25,depth-1);
+        createBranch(nx,ny,length*0.7,angle+25,depth-1);
+
+        if(depth===1){
+            createLeaf(nx,ny);
+        }
+    },500);
+}
 
 function growTree(){
-    const trunk = document.getElementById("trunk");
-    trunk.style.height="400px";
+    createBranch(0,0,200,0,6);
 
-    const tree = document.getElementById("tree");
-
-    for(let i=0;i<50;i++){
-        const leaf = document.createElement("div");
-        leaf.className="leaf";
-        leaf.style.left = (Math.random()*200-100)+"px";
-        leaf.style.top = (Math.random()*400)+"px";
-        leaf.style.animationDelay = Math.random()*8+"s";
-        tree.appendChild(leaf);
-    }
-
-    setTimeout(showPoems,4000);
+    setTimeout(startLeaves,6000);
+    setTimeout(showPoemLeft,7000);
 }
 
-/* ===== POEMAS ===== */
+function createLeaf(x,y){
+    const leaf = document.createElement("div");
+    leaf.className="leaf";
+    leaf.style.left=x+"px";
+    leaf.style.bottom=y+"px";
+    document.getElementById("tree").appendChild(leaf);
+}
 
-const poem1 = `Eres la calma en mi tormenta,
-la luz en mi oscuridad.
-Cada momento contigo
-se vuelve eternidad.`;
+function startLeaves(){
+    for(let i=0;i<40;i++){
+        const leaf = document.createElement("div");
+        leaf.className="leaf";
+        leaf.style.left=(Math.random()*200-100)+"px";
+        leaf.style.bottom="400px";
+        leaf.style.animationDelay=Math.random()*8+"s";
+        document.getElementById("tree").appendChild(leaf);
+    }
+}
 
-const poem2 = `Si el tiempo se detuviera,
-solo pediría una cosa:
-seguir a tu lado,
-mi vida hermosa.`;
+
+/* ===== POEMAS LARGOS ===== */
+
+const poem1 = `Desde el instante en que llegaste a mi vida,
+el mundo cambió su forma de girar.
+Las horas comenzaron a tener tu nombre,
+y el tiempo aprendió a esperarte.
+
+Tu sonrisa se volvió mi refugio,
+tu voz, la calma de mis días,
+y en cada latido descubrí
+que el amor no era un sueño,
+sino una realidad que respiraba en ti.
+
+Si el destino existe,
+sé que escribió tu nombre
+mucho antes de que yo pudiera pronunciarlo.`;
+
+const poem2 = `Hoy entiendo que amarte
+no es solo sentir,
+es elegirte cada día
+en cada pensamiento y en cada silencio.
+
+Porque en tus ojos encontré hogar,
+en tus abrazos, mi lugar,
+y en tu presencia
+la certeza de que la vida
+puede ser tan hermosa
+como siempre la imaginé.
+
+Y si el tiempo intentara separarnos,
+volvería a buscarte,
+una y otra vez,
+en cada vida que me toque vivir.`;
+
 
 function typeText(el,text,callback){
-    let i=0;
     el.style.opacity=1;
+    let i=0;
     const interval=setInterval(()=>{
-        el.innerHTML+=text[i];
+        el.innerHTML += text[i];
         i++;
         if(i>=text.length){
             clearInterval(interval);
-            if(callback) callback();
+            setTimeout(()=>{
+                el.style.opacity=0;
+                el.innerHTML="";
+                if(callback) callback();
+            },4000);
         }
-    },40);
+    },35);
 }
 
-function showPoems(){
-    const left=document.getElementById("poemLeft");
-    const right=document.getElementById("poemRight");
-    const counter=document.getElementById("counter");
-
-    typeText(left,poem1,()=>{
-        typeText(right,poem2,()=>{
-            counter.style.opacity=1;
-        });
-    });
+function showPoemLeft(){
+    typeText(document.getElementById("poemLeft"),poem1,showPoemRight);
 }
+
+function showPoemRight(){
+    typeText(document.getElementById("poemRight"),poem2,startCounter);
+}
+
 
 /* ===== CONTADOR ===== */
 
 let d=30,h=14,m=5,s=10;
-const time=document.getElementById("time");
+const timeEl=document.getElementById("time");
+const counter=document.getElementById("counter");
 
 function update(){
     s--;
@@ -142,10 +215,26 @@ function update(){
     if(h<0){h=23;d--;}
     if(d<0){d=0;}
 
-    time.textContent=`${d} días ${h} horas ${m} minutos ${s} segundos`;
+    timeEl.textContent=`${d} días ${h} horas ${m} minutos ${s} segundos`;
 }
 
 setInterval(update,1000);
-update();
+
+function startCounter(){
+    counter.style.opacity=1;
+
+    const fast=setInterval(()=>{
+        s-=5;
+        if(s<=0){
+            d=0;h=0;m=0;s=0;
+            update();
+            clearInterval(fast);
+
+            setTimeout(()=>{
+                window.location.href="final.html";
+            },5000);
+        }
+    },100);
+}
 
 
