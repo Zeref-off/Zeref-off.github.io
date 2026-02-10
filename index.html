@@ -1,32 +1,44 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Para Ti ❤️</title>
-    <link rel="stylesheet" href="styles.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Para Ti ❤️</title>
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-    <!-- Pantalla inicial -->
-    <div id="pantalla-inicio">
-
-        <!-- Fondo cascada -->
-        <div class="cascada" id="cascada"></div>
-
-        <!-- Cuadro iniciar -->
-        <div id="cuadro-iniciar">
-            <h1>INICIAR</h1>
-        </div>
-
+<!-- Pantalla inicial -->
+<div id="pantalla-inicio">
+    <div class="cascada" id="cascada"></div>
+    <div id="cuadro-iniciar">
+        <h1>INICIAR</h1>
     </div>
+</div>
 
-    <!-- Segunda pantalla -->
-    <div id="segunda-pantalla">
-        <h2>Bienvenida ❤️</h2>
+<!-- Escena principal -->
+<div id="escena">
+    <div id="gota"></div>
+    <canvas id="ondas"></canvas>
+    <canvas id="arbolCanvas"></canvas>
+
+    <!-- Poemas -->
+    <div id="poema-izq" class="poema"></div>
+    <div id="poema-der" class="poema"></div>
+
+    <!-- Contador -->
+    <div id="contador">
+        <div>Mi amor por ti comenzó hace...</div>
+        <div id="tiempo"></div>
     </div>
+</div>
 
-    <script src="script.js"></script>
+<!-- Pantalla final -->
+<div id="final">
+    Siempre contigo ❤️
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
 
