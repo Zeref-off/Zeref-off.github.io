@@ -1,29 +1,31 @@
-// Generar columnas de "TE AMO"
 const cascada = document.getElementById("cascada");
 const columnas = 15;
+const palabra = ["T","E","A","M","O"];
 
 for(let i = 0; i < columnas; i++){
     let col = document.createElement("div");
     col.classList.add("columna");
 
-    // Velocidad diferente por columna
-    col.style.animationDuration = (5 + Math.random() * 5) + "s";
+    // Velocidad más lenta (entre 10 y 18 segundos)
+    col.style.animationDuration = (10 + Math.random() * 8) + "s";
 
-    // Crear varios textos
-    for(let j = 0; j < 20; j++){
-        let texto = document.createElement("span");
-        texto.textContent = "TE AMO";
-        texto.style.animationDelay = (Math.random() * 3) + "s";
-        col.appendChild(texto);
+    // Repetir la palabra varias veces en la columna
+    for(let j = 0; j < 12; j++){
+        palabra.forEach(letra => {
+            let span = document.createElement("span");
+            span.classList.add("letra");
+            span.textContent = letra;
+            span.style.animationDelay = (Math.random() * 4) + "s";
+            col.appendChild(span);
+        });
     }
 
     cascada.appendChild(col);
 }
 
-// Evento del botón INICIAR
+// Evento INICIAR
 document.getElementById("cuadro-iniciar").addEventListener("click", function(){
     document.getElementById("pantalla-inicio").style.display = "none";
     document.getElementById("segunda-pantalla").style.display = "flex";
 });
-
 
