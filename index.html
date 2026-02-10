@@ -2,44 +2,45 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Para Ti ❤️</title>
+<title>San Valentín</title>
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-<!-- PANTALLA INICIAL -->
-<div id="pantalla-inicio">
+<!-- CASCADA -->
+<div id="cascade"></div>
 
-    <div class="cascada" id="cascada"></div>
-
-    <div id="cuadro-iniciar">
-        <h1>INICIAR</h1>
-    </div>
-
+<!-- BOTON INICIAR -->
+<div id="startBox">
+    INICIAR
 </div>
 
-<!-- ESCENA -->
-<div id="escena">
+<!-- AGUJERO / GOTA -->
+<div id="singularity"></div>
 
-    <div id="gota"></div>
-    <canvas id="ondas"></canvas>
-    <canvas id="arbolCanvas"></canvas>
-
-    <div id="poema-izq" class="poema"></div>
-    <div id="poema-der" class="poema"></div>
-
-    <div id="contador">
-        <div>Mi amor por ti comenzó hace...</div>
-        <div id="tiempo"></div>
-    </div>
-
+<!-- AGUA -->
+<div id="water">
+    <div class="ripple"></div>
+    <div class="ripple"></div>
+    <div class="ripple"></div>
 </div>
 
-<div id="final">Siempre contigo ❤️</div>
+<!-- ARBOL -->
+<div id="tree">
+    <div id="trunk"></div>
+</div>
+
+<!-- POEMAS -->
+<div id="poemLeft" class="poem"></div>
+<div id="poemRight" class="poem"></div>
+
+<!-- CONTADOR -->
+<div id="counter">
+Mi amor por ti comenzó hace...<br>
+<span id="time">30 días 14 horas 5 minutos 10 segundos</span>
+</div>
 
 <script src="script.js"></script>
 </body>
 </html>
-
 
