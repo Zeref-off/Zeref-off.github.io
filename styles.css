@@ -2,18 +2,12 @@ body{
     margin:0;
     background:black;
     overflow:hidden;
-    font-family:'Segoe UI', sans-serif;
+    font-family:Segoe UI;
     color:white;
 }
 
-/* Pantalla inicial */
-#pantalla-inicio{
-    position:fixed;
-    width:100%;
-    height:100vh;
-}
+/* ---------- CASCADA ---------- */
 
-/* Cascada */
 .cascada{
     position:absolute;
     width:100%;
@@ -30,7 +24,7 @@ body{
 
 .letra{
     color:#ff4d6d;
-    margin:3px 0;
+    margin:3px;
     opacity:0;
     animation: aparecer 4s infinite;
 }
@@ -42,50 +36,53 @@ body{
 
 @keyframes aparecer{
     0%,100%{opacity:0;}
-    50%{opacity:0.8;}
+    50%{opacity:0.9;}
 }
 
-/* Botón */
+/* ---------- BOTON ---------- */
+
+#pantalla-inicio{
+    position:fixed;
+    width:100%;
+    height:100vh;
+    transition:transform 1.2s, opacity 1.2s;
+}
+
 #cuadro-iniciar{
     position:absolute;
     top:50%;
     left:50%;
     transform:translate(-50%,-50%);
-    width:220px;
-    height:100px;
-    border-radius:20px;
+    width:260px;
+    height:140px;
     border:3px solid #ff003c;
+    border-radius:20px;
     background:transparent;
     display:flex;
     justify-content:center;
     align-items:center;
     cursor:pointer;
-    box-shadow:0 0 15px #ff003c,0 0 40px #ff003c;
-    z-index:10;
+    box-shadow:0 0 20px #ff003c;
 }
 
-#cuadro-iniciar h1{
-    color:#ff003c;
-}
+/* ---------- ESCENA ---------- */
 
-/* Escena */
 #escena{
     display:none;
     position:fixed;
     width:100%;
     height:100vh;
-    background:black;
 }
 
-/* Gota */
+/* Gota real */
 #gota{
     position:absolute;
     top:50%;
     left:50%;
-    width:10px;
-    height:10px;
+    width:14px;
+    height:20px;
     background:red;
-    border-radius:50%;
+    border-radius:50% 50% 60% 60%;
     transform:translate(-50%,-50%);
     box-shadow:0 0 15px red;
     display:none;
@@ -99,8 +96,7 @@ body{
     to{ top:85%; }
 }
 
-/* Canvas */
-#ondas, #arbolCanvas{
+canvas{
     position:absolute;
     width:100%;
     height:100%;
@@ -111,9 +107,8 @@ body{
     position:absolute;
     width:28%;
     top:20%;
-    color:#ffd6e0;
-    line-height:1.6;
     opacity:0;
+    color:#ffd6e0;
 }
 
 #poema-izq{ left:4%; }
@@ -124,9 +119,8 @@ body{
     position:absolute;
     bottom:5%;
     left:4%;
-    color:#ffd6e0;
-    font-size:18px;
     opacity:0;
+    color:#ffd6e0;
 }
 
 /* Final */
@@ -135,13 +129,8 @@ body{
     position:fixed;
     width:100%;
     height:100vh;
-    background:black;
     justify-content:center;
     align-items:center;
     font-size:40px;
     color:#ffb6c1;
 }
-
-
-
-
