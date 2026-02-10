@@ -1,6 +1,6 @@
 const cascada = document.getElementById("cascada");
 const columnas = 15;
-const palabra = ["S","A","G","A","P","O"];
+const palabra = ["F","A","T","U","M","","A","M","A","N","T","I","S",""];
 
 for(let i = 0; i < columnas; i++){
     let col = document.createElement("div");
@@ -28,5 +28,6 @@ document.getElementById("cuadro-iniciar").addEventListener("click", function(){
     document.getElementById("pantalla-inicio").style.display = "none";
     document.getElementById("segunda-pantalla").style.display = "flex";
 });
+
 
 
