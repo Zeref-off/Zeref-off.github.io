@@ -1,21 +1,14 @@
-/* Reset */
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family: 'Segoe UI', sans-serif;
-}
-
-/* General */
 body{
+    margin:0;
     background:black;
     overflow:hidden;
-    height:100vh;
+    font-family:'Segoe UI', sans-serif;
+    color:white;
 }
 
 /* Pantalla inicial */
 #pantalla-inicio{
-    position:relative;
+    position:fixed;
     width:100%;
     height:100vh;
 }
@@ -23,82 +16,130 @@ body{
 /* Cascada */
 .cascada{
     position:absolute;
-    top:0;
-    left:0;
     width:100%;
     height:100%;
     display:flex;
     justify-content:space-around;
-    pointer-events:none;
 }
 
-/* Columnas */
 .columna{
     display:flex;
     flex-direction:column;
-    align-items:center;
-    animation: caer linear infinite;
+    animation: caer 12s linear infinite;
 }
 
-/* Letras */
 .letra{
     color:#ff4d6d;
-    font-size:18px;
-    margin:4px 0;
+    margin:3px 0;
     opacity:0;
     animation: aparecer 4s infinite;
 }
 
-/* Animaciones (más lentas) */
 @keyframes caer{
-    0%{ transform: translateY(-120%); }
-    100%{ transform: translateY(120%); }
+    from{transform:translateY(-120%);}
+    to{transform:translateY(120%);}
 }
 
 @keyframes aparecer{
-    0%,100%{ opacity:0; }
-    50%{ opacity:0.8; }
+    0%,100%{opacity:0;}
+    50%{opacity:0.8;}
 }
 
-/* Cuadro central (transparente) */
+/* Botón */
 #cuadro-iniciar{
     position:absolute;
     top:50%;
     left:50%;
-    transform:translate(-50%, -50%);
-    width:220px;
-    height:100px;
-    background:transparent; /* sin fondo */
+    transform:translate(-50%,-50%);
+    width:260px;
+    height:140px;
     border-radius:20px;
+    border:3px solid #ff003c;
+    background:transparent;
     display:flex;
     justify-content:center;
     align-items:center;
     cursor:pointer;
+    box-shadow:0 0 15px #ff003c,0 0 40px #ff003c;
     z-index:10;
-
-    border:3px solid #ff003c;
-    box-shadow:
-        0 0 10px #ff003c,
-        0 0 20px #ff003c,
-        0 0 40px #ff003c;
 }
 
-/* Texto del botón */
 #cuadro-iniciar h1{
     color:#ff003c;
-    letter-spacing:3px;
 }
 
-/* Segunda pantalla */
-#segunda-pantalla{
+/* Escena */
+#escena{
     display:none;
+    position:fixed;
     width:100%;
     height:100vh;
     background:black;
-    color:white;
+}
+
+/* Gota */
+#gota{
+    position:absolute;
+    top:50%;
+    left:50%;
+    width:10px;
+    height:10px;
+    background:red;
+    border-radius:50%;
+    transform:translate(-50%,-50%);
+    box-shadow:0 0 15px red;
+    display:none;
+}
+
+.caer{
+    animation:caerGota 2.5s forwards ease-in;
+}
+
+@keyframes caerGota{
+    to{ top:85%; }
+}
+
+/* Canvas */
+#ondas, #arbolCanvas{
+    position:absolute;
+    width:100%;
+    height:100%;
+}
+
+/* Poemas */
+.poema{
+    position:absolute;
+    width:28%;
+    top:20%;
+    color:#ffd6e0;
+    line-height:1.6;
+    opacity:0;
+}
+
+#poema-izq{ left:4%; }
+#poema-der{ right:4%; text-align:right; }
+
+/* Contador */
+#contador{
+    position:absolute;
+    bottom:5%;
+    left:4%;
+    color:#ffd6e0;
+    font-size:18px;
+    opacity:0;
+}
+
+/* Final */
+#final{
+    display:none;
+    position:fixed;
+    width:100%;
+    height:100vh;
+    background:black;
     justify-content:center;
     align-items:center;
-    font-size:32px;
+    font-size:40px;
+    color:#ffb6c1;
 }
 
 
