@@ -7,7 +7,7 @@ for(let i = 0; i < columnas; i++){
     col.classList.add("columna");
 
     // Velocidad más lenta (entre 10 y 18 segundos)
-    col.style.animationDuration = (10 + Math.random() * 8) + "s";
+    col.style.animationDuration = (15 + Math.random() * 9) + "s";
 
     // Repetir la palabra varias veces en la columna
     for(let j = 0; j < 12; j++){
@@ -28,6 +28,7 @@ document.getElementById("cuadro-iniciar").addEventListener("click", function(){
     document.getElementById("pantalla-inicio").style.display = "none";
     document.getElementById("segunda-pantalla").style.display = "flex";
 });
+
 
 
 
