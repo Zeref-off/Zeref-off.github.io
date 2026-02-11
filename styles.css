@@ -1,72 +1,55 @@
-body{
+body,html{
 margin:0;
-overflow:hidden;
+padding:0;
 background:black;
+overflow:hidden;
 font-family:monospace;
 color:white;
 }
 
-.hidden{ display:none; }
-
-/* INICIO */
-#inicio{
-position:absolute;
+.screen{
+position:fixed;
 width:100%;
 height:100%;
+display:none;
 }
 
-#matrixCanvas{
-position:absolute;
-width:100%;
-height:100%;
+.screen.active{
+display:block;
 }
 
-#btnInicio{
+#startBox{
 position:absolute;
 top:50%;
 left:50%;
 transform:translate(-50%,-50%);
-font-size:28px;
-padding:15px 50px;
-background:#7a0000;
-color:white;
-border:none;
+padding:30px 60px;
+border:3px solid #ff0040;
+border-radius:20px;
+color:#ff0040;
+font-size:24px;
+box-shadow:0 0 25px #ff0040;
 cursor:pointer;
+background:transparent;
 }
 
-/* ESCENA */
-#scene{
-position:absolute;
-width:100%;
-height:100%;
-}
-
-/* CONTADOR */
-#contador{
-position:absolute;
-top:20px;
-width:100%;
-text-align:center;
-font-size:22px;
-}
-
-/* POEMAS */
 .poema{
 position:absolute;
+top:50%;
+transform:translateY(-50%);
 width:25%;
-top:60%;
 opacity:0;
-transform:translateY(80px);
-transition:all 6s linear;
+font-size:16px;
 line-height:1.6;
-font-size:18px;
 }
 
-.poema.visible{
-opacity:1;
-transform:translateY(-40px);
-}
+#poemaLeft{left:5%;}
+#poemaRight{right:5%;}
 
-#poemaIzq{ left:5%; }
-#poemaDer{ right:5%; }
+#contador{
+position:absolute;
+bottom:20px;
+left:20px;
+font-size:14px;
+}
 
