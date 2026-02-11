@@ -6,7 +6,9 @@ body{
     color:white;
 }
 
-/* ========= Pantalla inicio ========= */
+.hidden{ display:none; }
+
+/* Inicio */
 #startScreen{
     position:fixed;
     width:100vw;
@@ -24,31 +26,29 @@ body{
     top:50%;
     left:50%;
     transform:translate(-50%,-50%);
-    padding:30px 70px;
+    padding:30px 80px;
     border:3px solid #ff0033;
     border-radius:15px;
     color:#ff0033;
     font-size:28px;
     cursor:pointer;
-    background:transparent;
     box-shadow:0 0 20px #ff0033;
 }
 
-/* ========= Escena principal ========= */
-.hidden{ display:none; }
-
+/* Escena */
 #scene{
     position:relative;
     width:100vw;
     height:100vh;
 }
 
-canvas{
+#mainCanvas{
     position:absolute;
     top:0;
     left:0;
 }
 
+/* Poemas */
 .poem{
     position:absolute;
     width:28%;
@@ -67,17 +67,7 @@ canvas{
     left:50%;
     transform:translateX(-50%);
     text-align:center;
+    font-size:18px;
 }
 
-/* ========= Desintegración ========= */
-.fadeOut{
-    animation:fadeScene 5s forwards;
-}
-
-@keyframes fadeScene{
-    to{
-        opacity:0;
-        filter:blur(8px);
-    }
-}
 
