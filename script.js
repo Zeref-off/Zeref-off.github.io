@@ -1,282 +1,198 @@
-/* =====================================================
-   MATRIX SINCRONIZADO → LUEGO EFECTO MATRIX
-===================================================== */
-
-const canvas = document.getElementById("matrixCanvas");
+const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-const text = "FATUM AMANTIS";
-const size = 16;
-const cols = Math.floor(canvas.width/size);
-
-let drops = new Array(cols).fill(0);
-let syncPhase = true;
-
-function matrix(){
-    ctx.fillStyle="rgba(0,0,0,0.08)";
-    ctx.fillRect(0,0,canvas.width,canvas.height);
-
-    ctx.fillStyle="#ff3366";
-    ctx.font=size+"px monospace";
-
-    for(let i=0;i<drops.length;i++){
-        const char = text[Math.floor(Math.random()*text.length)];
-        ctx.fillText(char,i*size,drops[i]);
-
-        if(syncPhase){
-            drops[i]+=size;
-        }else{
-            drops[i]+=size*(Math.random()*0.5+0.5);
-        }
-
-        if(drops[i]>canvas.height){
-            if(syncPhase){
-                syncPhase=false; // al llegar al fondo inicia modo Matrix
-            }
-            if(Math.random()>0.975) drops[i]=0;
-        }
-    }
-}
-
-setInterval(matrix,50);
+const W = canvas.width;
+const H = canvas.height;
 
 /* =====================================================
-   INICIAR
+   PIXEL ART TREE
 ===================================================== */
 
-document.getElementById("startBox").onclick = ()=>{
-    document.getElementById("startScreen").style.display="none";
-    document.getElementById("scene").classList.remove("hidden");
-    startScene();
-};
+let treePixels = [];
 
-/* =====================================================
-   ESCENA PRINCIPAL
-===================================================== */
+function drawPixel(x,y,color){
+    ctx.fillStyle=color;
+    ctx.fillRect(x,y,4,4);
+}
 
-function startScene(){
-
-const canvas = document.getElementById("mainCanvas");
-const ctx = canvas.getContext("2d");
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-
-let W = canvas.width;
-let H = canvas.height;
-
-/* ---------- GOTA ---------- */
-
-let dropY = -50;
-
-function animateDrop(){
-    ctx.clearRect(0,0,W,H);
-
-    ctx.fillStyle="red";
-    ctx.beginPath();
-    ctx.arc(W/2,dropY,10,0,Math.PI*2);
-    ctx.fill();
-
-    dropY += 4;
-
-    if(dropY < H-40){
-        requestAnimationFrame(animateDrop);
-    }else{
-        ripple();
+function addBranch(x,y,len,dx,dy){
+    for(let i=0;i<len;i++){
+        treePixels.push({x:x+i*dx, y:y+i*dy, color:"#5b3a1a"});
     }
 }
 
-animateDrop();
+function generateTree(){
 
-/* ---------- ONDAS ---------- */
+    const baseX = Math.floor(W/2);
+    const baseY = H;
 
-let rippleRadius = 0;
+    let height = Math.floor(H*0.7);
 
-function ripple(){
-    function anim(){
-        ctx.clearRect(0,0,W,H);
+    // Tronco principal
+    for(let i=0;i<height;i++){
+        for(let w=-2;w<=2;w++){
+            treePixels.push({
+                x:baseX+w*4,
+                y:baseY-i*4,
+                color:"#5b3a1a"
+            });
+        }
 
-        ctx.strokeStyle="rgba(255,0,0,"+(1-rippleRadius/100)+")";
-        ctx.beginPath();
-        ctx.arc(W/2,H-30,rippleRadius,0,Math.PI*2);
-        ctx.stroke();
-
-        rippleRadius+=2;
-
-        if(rippleRadius<100){
-            requestAnimationFrame(anim);
-        }else{
-            growTree();
+        // Ramificaciones
+        if(i%20===0 && i>40){
+            addBranch(baseX,baseY-i*4,20,1,-1);
+            addBranch(baseX,baseY-i*4,20,-1,-1);
         }
     }
-    anim();
+
+    // Hojas pixel
+    treePixels.forEach(p=>{
+        if(Math.random()>0.85){
+            treePixels.push({
+                x:p.x + Math.random()*20-10,
+                y:p.y + Math.random()*20-10,
+                color:"#ff9acb"
+            });
+        }
+    });
 }
 
-/* ---------- ÁRBOL CRECIENDO ---------- */
+generateTree();
 
-let growth = 0;
+/* =====================================================
+   NIEVE
+===================================================== */
 
-function branch(x,y,len,angle,depth){
-    if(depth===0 || len<2) return;
+let snow=[];
+for(let i=0;i<150;i++){
+    snow.push({
+        x:Math.random()*W,
+        y:Math.random()*H,
+        r:Math.random()*2+1
+    });
+}
 
-    const x2 = x + len*Math.cos(angle);
-    const y2 = y - len*Math.sin(angle);
-
-    ctx.strokeStyle="#3b2314";
-    ctx.lineWidth=depth/2;
-    ctx.beginPath();
-    ctx.moveTo(x,y);
-    ctx.lineTo(x2,y2);
-    ctx.stroke();
-
-    // hojas
-    if(depth<3){
-        ctx.fillStyle="pink";
+function drawSnow(){
+    ctx.fillStyle="white";
+    snow.forEach(s=>{
         ctx.beginPath();
-        ctx.arc(x2,y2,2,0,Math.PI*2);
+        ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
         ctx.fill();
-    }
-
-    branch(x2,y2,len*0.7,angle+0.35,depth-1);
-    branch(x2,y2,len*0.7,angle-0.35,depth-1);
-}
-
-function growTree(){
-    function anim(){
-        ctx.clearRect(0,0,W,H);
-        branch(W/2,H, growth, Math.PI/2, 8);
-        growth += 2;
-
-        if(growth < 160){
-            requestAnimationFrame(anim);
-        }else{
-            afterTree();
-        }
-    }
-    anim();
+        s.y+=0.5;
+        if(s.y>H) s.y=0;
+    });
 }
 
 /* =====================================================
-   DESPUÉS DEL ÁRBOL
+   CONTADOR
 ===================================================== */
 
-function afterTree(){
-    document.getElementById("counterBox").classList.remove("hidden");
-    showPoemLeft();
-}
-
-/* ---------- POEMAS ---------- */
-
-const poem1 = `
-Eres el silencio que calma mis días,
-la luz que despierta mi alma.
-Desde que llegaste,
-el tiempo aprendió a sonreír.
-`;
-
-const poem2 = `
-Si el destino me dio una razón,
-esa razón eres tú.
-Porque amarte no es un momento,
-es mi eternidad.
-`;
-
-function scrollPoem(element,text,callback){
-    element.innerText=text;
-    element.style.opacity=1;
-    let pos = 50;
-
-    function anim(){
-        pos -= 0.2;
-        element.style.transform=`translateY(${pos}%)`;
-
-        if(pos > -150){
-            requestAnimationFrame(anim);
-        }else{
-            element.style.opacity=0;
-            if(callback) callback();
-        }
-    }
-    anim();
-}
-
-function showPoemLeft(){
-    scrollPoem(document.getElementById("poemLeft"),poem1,showPoemRight);
-}
-
-function showPoemRight(){
-    scrollPoem(document.getElementById("poemRight"),poem2,startBomb);
-}
-
-/* =====================================================
-   CONTADOR BOMBA
-===================================================== */
-
-let time={d:30,h:10,m:5,s:39};
-let fast=false;
+let time={d:0,h:0,m:0,s:15};
+let oceanMode=false;
 
 const counter = document.getElementById("counter");
 
-function update(){
-    if(!fast){
+function updateCounter(){
+
+    if(time.s>0){
         time.s--;
-        if(time.s<0){time.s=59;time.m--;}
     }else{
-        time.s-=5;
-        if(time.s<=0){time.s=0;time.m-=2;}
-        if(time.m<=0){time.m=0;time.h--;}
-        if(time.h<=0){time.h=0;time.d--;}
-        if(time.d<=0){time.d=0;disintegrate();}
+        startOcean();
+        clearInterval(counterInterval);
     }
 
     counter.innerText =
     `${time.d} días ${time.h} horas ${time.m} minutos ${time.s} segundos`;
-
-    if(time.d<2) counter.style.color="red";
 }
 
-setInterval(update,1000);
+const counterInterval = setInterval(updateCounter,1000);
 
-function startBomb(){
-    fast=true;
+/* =====================================================
+   OCEAN PARTICLES
+===================================================== */
+
+let oceanParticles=[];
+let heartParticles=[];
+let phase="tree";
+
+function startOcean(){
+    phase="ocean";
+
+    treePixels.forEach(p=>{
+        oceanParticles.push({
+            x:p.x,
+            y:p.y,
+            vx:(Math.random()-0.5)*2,
+            vy:Math.random()*2,
+            size:Math.random()*3+1
+        });
+    });
+
+    setTimeout(startHeart,10000);
 }
 
 /* =====================================================
-   DESINTEGRACIÓN SUAVE
+   HEART FORMATION
 ===================================================== */
 
-function disintegrate(){
+function startHeart(){
+    phase="heart";
 
-    const particles=[];
-    for(let i=0;i<400;i++){
-        particles.push({
-            x:Math.random()*W,
-            y:Math.random()*H,
-            vx:(Math.random()-0.5)*0.5,
-            vy:(Math.random()-0.5)*0.5,
-            r:Math.random()*2
+    const centerX=W/2;
+    const centerY=H/2;
+
+    for(let t=0;t<Math.PI*2;t+=0.02){
+        let x = 16*Math.pow(Math.sin(t),3);
+        let y = -(13*Math.cos(t) -5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t));
+
+        heartParticles.push({
+            x:centerX + x*10,
+            y:centerY + y*10,
+            angle:Math.random()*Math.PI*2
+        });
+    }
+}
+
+/* =====================================================
+   MAIN LOOP
+===================================================== */
+
+function animate(){
+
+    ctx.clearRect(0,0,W,H);
+
+    if(phase==="tree"){
+        treePixels.forEach(p=>{
+            drawPixel(p.x,p.y,p.color);
+        });
+        drawSnow();
+    }
+
+    if(phase==="ocean"){
+        oceanParticles.forEach(p=>{
+            p.y += Math.sin(Date.now()*0.002 + p.x*0.01);
+            ctx.fillStyle="rgba(0,150,255,0.7)";
+            ctx.fillRect(p.x,p.y,p.size,p.size);
         });
     }
 
-    function anim(){
-        ctx.clearRect(0,0,W,H);
-        ctx.fillStyle="rgba(255,255,255,0.7)";
+    if(phase==="heart"){
+        heartParticles.forEach(p=>{
+            p.angle += 0.01;
+            let x = p.x + Math.cos(p.angle)*2;
+            let y = p.y + Math.sin(p.angle)*2;
 
-        particles.forEach(p=>{
-            p.x+=p.vx;
-            p.y+=p.vy;
-            ctx.beginPath();
-            ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-            ctx.fill();
+            ctx.fillStyle="#00bfff";
+            ctx.fillRect(x,y,2,2);
         });
-
-        requestAnimationFrame(anim);
     }
 
-    anim();
+    requestAnimationFrame(animate);
 }
 
-}
+animate();
+
 
