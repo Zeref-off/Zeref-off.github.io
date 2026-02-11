@@ -1,250 +1,57 @@
 <!DOCTYPE html>
+
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>Final Cinematográfico</title>
-<style>
-body{
-  margin:0;
-  overflow:hidden;
-  background:#020617;
-  font-family:Arial;
-  color:white;
-}
-
-/* Pantallas */
-.screen{
-  position:absolute;
-  width:100%;
-  height:100%;
-  display:none;
-}
-.active{display:block}
-
-/* INICIO */
-#inicio{
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  background:radial-gradient(circle,#020617,#000);
-  z-index:5;
-}
-#startBtn{
-  padding:15px 40px;
-  font-size:24px;
-  background:#0ea5e9;
-  border:none;
-  color:white;
-  border-radius:10px;
-  cursor:pointer;
-}
-
-/* Contador */
-#counter{
-  position:absolute;
-  top:20px;
-  left:50%;
-  transform:translateX(-50%);
-  font-size:40px;
-  z-index:4;
-}
-
-/* Árbol */
-#tree{
-  position:absolute;
-  bottom:0;
-  left:50%;
-  transform:translateX(-50%);
-  image-rendering:pixelated;
-  z-index:2;
-}
-canvas{
-  position:absolute;
-  top:0;
-  left:0;
-}
-</style>
+    <meta charset="UTF-8">
+    <title>Fatum Amantis</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-<div id="inicio" class="screen active">
-  <h1>INICIO</h1>
-  <button id="startBtn">Comenzar</button>
+<!-- ================= PANTALLA DE INICIO ================= -->
+
+<div id="screenInicio" class="screen active">
+
+```
+<!-- Fondo Matrix -->
+<canvas id="matrixCanvas"></canvas>
+
+<!-- Botón INICIAR -->
+<div id="startBox" onclick="iniciar()">
+    INICIAR
+</div>
+```
+
 </div>
 
-<div id="scene" class="screen">
-  <div id="counter">15</div>
-  <canvas id="main"></canvas>
-  <canvas id="tree"></canvas>
+<!-- ================= ESCENA PRINCIPAL ================= -->
+
+<div id="screenScene" class="screen">
+
+```
+<!-- Canvas principal donde ocurre toda la animación -->
+<canvas id="sceneCanvas"></canvas>
+
+<!-- Poema izquierdo -->
+<div id="poemaLeft" class="poema"></div>
+
+<!-- Poema derecho -->
+<div id="poemaRight" class="poema"></div>
+
+<!-- Contador -->
+<div id="contador">
+    Mi amor por ti empezó hace…<br>
+    <span id="time">30d 10h 5m 39s</span>
+</div>
+```
+
 </div>
 
-<script>
-const inicio = document.getElementById("inicio");
-const scene = document.getElementById("scene");
-const startBtn = document.getElementById("startBtn");
-const counterEl = document.getElementById("counter");
+<!-- ================= SCRIPT ================= -->
 
-const canvas = document.getElementById("main");
-const ctx = canvas.getContext("2d");
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+<script src="script.js"></script>
 
-/* ---------- ÁRBOL PIXEL GRANDE ---------- */
-const treeCanvas = document.getElementById("tree");
-const tctx = treeCanvas.getContext("2d");
-treeCanvas.width = 260;
-treeCanvas.height = canvas.height * 0.7;
-
-function drawTree(){
-  const h = treeCanvas.height;
-
-  // Tronco
-  tctx.fillStyle="#4a2c18";
-  tctx.fillRect(115,h-220,30,220);
-
-  // Ramas
-  for(let i=0;i<7;i++){
-    tctx.fillRect(115-(i*15),h-220-(i*35),30+(i*30),12);
-  }
-
-  // Hojas frondosas
-  for(let i=0;i<900;i++){
-    const x = 30 + Math.random()*200;
-    const y = Math.random()*(h-220);
-    const size = 3 + Math.random()*4;
-    const g = 120 + Math.random()*80;
-    tctx.fillStyle = `rgb(0,${g},0)`;
-    tctx.fillRect(x,y,size,size);
-  }
-}
-drawTree();
-
-/* ---------- NIEVE ---------- */
-let snow=[];
-for(let i=0;i<250;i++){
-  snow.push({
-    x:Math.random()*canvas.width,
-    y:Math.random()*canvas.height,
-    speed:1+Math.random()*2,
-    size:1+Math.random()*3
-  });
-}
-
-/* ---------- PARTÍCULAS ---------- */
-let particles=[];
-let ocean=false;
-let heart=false;
-let angle=0;
-
-/* Desintegrar árbol */
-function dissolveTree(){
-  const rect = treeCanvas.getBoundingClientRect();
-
-  for(let i=0;i<4000;i++){
-    particles.push({
-      x:rect.left + Math.random()*rect.width,
-      y:rect.top + Math.random()*rect.height,
-      vx:(Math.random()-0.5)*3,
-      vy:(Math.random()-0.5)*3,
-      z:(Math.random()-0.5)*300
-    });
-  }
-
-  treeCanvas.style.display="none";
-}
-
-/* ---------- CORAZÓN 3D ---------- */
-function createHeart(){
-  particles=[];
-  for(let t=0;t<Math.PI*2;t+=0.03){
-    for(let s=0;s<1;s+=0.08){
-      const x=16*Math.pow(Math.sin(t),3);
-      const y=13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t);
-
-      particles.push({
-        baseX:x*20*s,
-        baseY:-y*20*s,
-        baseZ:(Math.random()-0.5)*200
-      });
-    }
-  }
-}
-
-/* ---------- INICIO ---------- */
-startBtn.onclick=()=>{
-  inicio.classList.remove("active");
-  scene.classList.add("active");
-  startCounter();
-};
-
-/* ---------- CONTADOR ---------- */
-function startCounter(){
-  let time=15;
-  const int=setInterval(()=>{
-    time--;
-    counterEl.textContent=time;
-    if(time<=0){
-      clearInterval(int);
-      counterEl.style.display="none";
-      dissolveTree();
-
-      setTimeout(()=>ocean=true,1000);
-      setTimeout(()=>{
-        heart=true;
-        createHeart();
-      },10000);
-    }
-  },1000);
-}
-
-/* ---------- LOOP ---------- */
-function animate(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-
-  /* Nieve */
-  ctx.fillStyle="white";
-  snow.forEach(s=>{
-    ctx.fillRect(s.x,s.y,s.size,s.size);
-    s.y+=s.speed;
-    if(s.y>canvas.height) s.y=0;
-  });
-
-  ctx.fillStyle="#38bdf8";
-
-  particles.forEach(p=>{
-    if(!heart){
-      if(ocean){
-        p.y += Math.sin(p.x*0.01 + Date.now()*0.002);
-      }else{
-        p.x+=p.vx;
-        p.y+=p.vy;
-      }
-      ctx.fillRect(p.x,p.y,2,2);
-    }else{
-      angle+=0.002;
-      const cos=Math.cos(angle);
-      const sin=Math.sin(angle);
-
-      const x = p.baseX;
-      const z = p.baseZ;
-
-      const rx = x*cos - z*sin;
-      const rz = x*sin + z*cos;
-
-      const scale = 400/(400+rz);
-
-      const drawX = canvas.width/2 + rx*scale;
-      const drawY = canvas.height/2 + p.baseY*scale;
-
-      ctx.fillRect(drawX,drawY,2,2);
-    }
-  });
-
-  requestAnimationFrame(animate);
-}
-animate();
-</script>
 </body>
 </html>
 
