@@ -5,50 +5,46 @@
     <meta charset="UTF-8">
     <title>Fatum Amantis</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
+
+```
+<!-- CSS -->
+<link rel="stylesheet" href="styles.css">
+```
+
 </head>
 <body>
 
-<!-- ================= PANTALLA DE INICIO ================= -->
+<!-- PANTALLA INICIAL -->
 
-<div id="screenInicio" class="screen active">
+<div id="inicio">
+    <canvas id="matrixCanvas"></canvas>
 
 ```
-<!-- Fondo Matrix -->
-<canvas id="matrixCanvas"></canvas>
-
-<!-- Botón INICIAR -->
-<div id="startBox" onclick="iniciar()">
-    INICIAR
+<div id="botonContainer">
+    <button id="btnInicio">INICIAR</button>
 </div>
 ```
 
 </div>
 
-<!-- ================= ESCENA PRINCIPAL ================= -->
+<!-- ESCENA PRINCIPAL -->
 
-<div id="screenScene" class="screen">
+<div id="escena" class="hidden">
+    <canvas id="scene"></canvas>
 
 ```
-<!-- Canvas principal donde ocurre toda la animación -->
-<canvas id="sceneCanvas"></canvas>
-
-<!-- Poema izquierdo -->
-<div id="poemaLeft" class="poema"></div>
-
-<!-- Poema derecho -->
-<div id="poemaRight" class="poema"></div>
-
-<!-- Contador -->
 <div id="contador">
-    Mi amor por ti empezó hace…<br>
-    <span id="time">30d 10h 5m 39s</span>
+    Mi amor por ti empezó hace:
+    <span id="tiempo"></span>
 </div>
+
+<div id="poemaIzq" class="poema"></div>
+<div id="poemaDer" class="poema"></div>
 ```
 
 </div>
 
-<!-- ================= SCRIPT ================= -->
+<!-- JavaScript -->
 
 <script src="script.js"></script>
 
