@@ -3,48 +3,38 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Fatum Amantis</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-```
-<!-- CSS -->
-<link rel="stylesheet" href="styles.css">
-```
-
+    <title>Historia Cinematográfica</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-<!-- PANTALLA INICIAL -->
-
-<div id="inicio">
-    <canvas id="matrixCanvas"></canvas>
-
-```
-<div id="botonContainer">
-    <button id="btnInicio">INICIAR</button>
-</div>
-```
-
+<div id="intro">
+    <button id="startBtn">Iniciar</button>
 </div>
 
-<!-- ESCENA PRINCIPAL -->
-
-<div id="escena" class="hidden">
-    <canvas id="scene"></canvas>
+<div id="scene" class="hidden">
+    <h1 id="title">Mi amor por ti empezó hace</h1>
 
 ```
-<div id="contador">
-    Mi amor por ti empezó hace:
-    <span id="tiempo"></span>
+<div id="counter">
+    <span id="days">0</span>d :
+    <span id="hours">0</span>h :
+    <span id="minutes">0</span>m :
+    <span id="seconds">0</span>s
 </div>
 
-<div id="poemaIzq" class="poema"></div>
-<div id="poemaDer" class="poema"></div>
+<!-- Poemas -->
+<div class="poem left">Eres la raíz de mis sueños</div>
+<div class="poem right">Y el destino de mi corazón</div>
+
+<!-- Árbol -->
+<canvas id="treeCanvas"></canvas>
+
+<!-- Partículas (océano y corazón) -->
+<canvas id="particleCanvas"></canvas>
 ```
 
 </div>
-
-<!-- JavaScript -->
 
 <script src="script.js"></script>
 
