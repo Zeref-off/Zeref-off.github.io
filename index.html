@@ -1,32 +1,42 @@
 <!DOCTYPE html>
+
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <title>Fatum Amantis</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-<!-- Pantalla inicial -->
-<div id="intro">
-    <div id="matrix"></div>
+<!-- PANTALLA INICIO -->
 
-    <div id="startContainer">
-        <div id="startBox">INICIAR</div>
-    </div>
+<div id="inicio">
+    <canvas id="matrixCanvas"></canvas>
+    <button id="btnInicio">INICIAR</button>
 </div>
 
-<!-- Escena principal -->
-<div id="scene">
-    <canvas id="canvas"></canvas>
-    <div id="loveText">Mi amor por ti empezó hace...</div>
-    <div id="counter"></div>
+<!-- ESCENA PRINCIPAL -->
+
+<div id="escena" class="hidden">
+    <canvas id="sceneCanvas"></canvas>
+
+```
+<div id="contador">
+    Mi amor por ti empezó hace:
+    <span id="tiempo">30d 10h 5m 39s</span>
+</div>
+
+<div id="poemaIzq" class="poema"></div>
+<div id="poemaDer" class="poema"></div>
+```
+
 </div>
 
 <script src="script.js"></script>
+
 </body>
 </html>
+
 
 
 
