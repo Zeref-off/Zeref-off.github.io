@@ -1,358 +1,182 @@
-/* =====================================================
-CONFIGURACIÓN GENERAL
-===================================================== */
-const W = window.innerWidth;
-const H = window.innerHeight;
+// Esperar a que todo cargue
+window.onload = function () {
 
-/* =====================================================
-MATRIX INICIAL (Fatum Amantis vertical)
-===================================================== */
-const matrixCanvas = document.getElementById("matrixCanvas");
-const mtx = matrixCanvas.getContext("2d");
-matrixCanvas.width = W;
-matrixCanvas.height = H;
+const startBtn = document.getElementById("startBtn");
+const intro = document.getElementById("intro");
+const scene = document.getElementById("scene");
 
-const letters = "FATUMAMANTIS";
-const size = 34;
-const columns = Math.floor(W / size);
-const drops = Array(columns).fill(0);
+const poemLeft = document.querySelector(".left");
+const poemRight = document.querySelector(".right");
 
-function matrix(){
-mtx.fillStyle = "rgba(0,0,0,0.08)";
-mtx.fillRect(0,0,W,H);
+const daysEl = document.getElementById("days");
+const hoursEl = document.getElementById("hours");
+const minutesEl = document.getElementById("minutes");
+const secondsEl = document.getElementById("seconds");
+
+const treeCanvas = document.getElementById("treeCanvas");
+const tctx = treeCanvas.getContext("2d");
+
+const particleCanvas = document.getElementById("particleCanvas");
+const pctx = particleCanvas.getContext("2d");
+
+treeCanvas.width = window.innerWidth;
+treeCanvas.height = window.innerHeight;
+particleCanvas.width = window.innerWidth;
+particleCanvas.height = window.innerHeight;
+
+let countdownInterval;
+let particles = [];
+let phase = "tree";
+
+startBtn.onclick = () => {
+intro.style.display = "none";
+scene.classList.remove("hidden");
 
 ```
-mtx.fillStyle = "#ff4d6d";
-mtx.font = size + "px monospace";
+drawTree();
 
-for(let i=0;i<columns;i++){
-    const letter = letters[Math.floor(Math.random()*letters.length)];
-    mtx.fillText(letter, i*size, drops[i]*size);
+// Mostrar poemas
+setTimeout(() => poemLeft.classList.add("showPoem"), 500);
+setTimeout(() => poemRight.classList.add("showPoem"), 1500);
 
-    if(drops[i]*size > H && Math.random()>0.975){
-        drops[i] = 0;
-    }
-    drops[i]++;
-}
+// Ocultarlos
+setTimeout(() => poemLeft.classList.add("hidePoem"), 7000);
+setTimeout(() => {
+    poemRight.classList.add("hidePoem");
+    startCountdownFast();
+}, 9000);
 ```
 
-}
-
-setInterval(matrix, 50);
-
-/* =====================================================
-CAMBIO A ESCENA
-===================================================== */
-document.getElementById("btnInicio").onclick = ()=>{
-document.getElementById("inicio").classList.add("hidden");
-document.getElementById("escena").classList.remove("hidden");
-fase = "espiral";
 };
 
-/* =====================================================
-CANVAS PRINCIPAL
-===================================================== */
-const canvas = document.getElementById("scene");
-const ctx = canvas.getContext("2d");
-canvas.width = W;
-canvas.height = H;
+// Árbol frondoso y tronco grueso
+function drawTree() {
+const w = treeCanvas.width / 2;
+const h = treeCanvas.height;
 
-let fase = "inicio";
-let particles = [];
-let ramas = [];
-let gota = null;
-let ondas = [];
+```
+tctx.clearRect(0, 0, treeCanvas.width, treeCanvas.height);
 
-/* =====================================================
-ESPIRAL DE ABSORCIÓN
-===================================================== */
-function espiral(){
-for(let i=0;i<40;i++){
+function branch(x, y, len, angle, width) {
+    if (len < 10) {
+        // hojas (más densas)
+        for (let i = 0; i < 3; i++) {
+            tctx.fillStyle = "rgba(0,150,0,0.8)";
+            tctx.beginPath();
+            tctx.arc(x, y, 6, 0, Math.PI * 2);
+            tctx.fill();
+        }
+        return;
+    }
+
+    tctx.lineWidth = width;
+    tctx.strokeStyle = "#5a3b1a";
+    tctx.beginPath();
+    tctx.moveTo(x, y);
+
+    const x2 = x + len * Math.cos(angle);
+    const y2 = y - len * Math.sin(angle);
+
+    tctx.lineTo(x2, y2);
+    tctx.stroke();
+
+    branch(x2, y2, len * 0.75, angle - 0.3, width * 0.7);
+    branch(x2, y2, len * 0.75, angle + 0.3, width * 0.7);
+}
+
+// Tronco grueso
+branch(w, h, 120, Math.PI / 2, 22);
+```
+
+}
+
+// Contador rápido
+function startCountdownFast() {
+let totalSeconds = 10; // cuenta corta para efecto
+
+```
+countdownInterval = setInterval(() => {
+    totalSeconds--;
+
+    let d = Math.floor(totalSeconds / 86400);
+    let h = Math.floor((totalSeconds % 86400) / 3600);
+    let m = Math.floor((totalSeconds % 3600) / 60);
+    let s = totalSeconds % 60;
+
+    daysEl.textContent = d;
+    hoursEl.textContent = h;
+    minutesEl.textContent = m;
+    secondsEl.textContent = s;
+
+    if (totalSeconds <= 0) {
+        clearInterval(countdownInterval);
+        phase = "ocean";
+        createParticles();
+        animateParticles();
+    }
+}, 200); // rápido
+```
+
+}
+
+// Crear partículas desde el árbol
+function createParticles() {
+for (let i = 0; i < 800; i++) {
 particles.push({
-angle:Math.random()*Math.PI*2,
-radius:Math.random()*Math.max(W,H)
+x: treeCanvas.width / 2,
+y: treeCanvas.height / 2,
+vx: (Math.random() - 0.5) * 6,
+vy: Math.random() * 4,
+size: Math.random() * 2 + 1
 });
 }
-
-```
-particles.forEach(p=>{
-    p.angle += 0.06;
-    p.radius *= 0.95;
-    const x = W/2 + Math.cos(p.angle)*p.radius;
-    const y = H/2 + Math.sin(p.angle)*p.radius;
-    ctx.fillStyle="white";
-    ctx.fillRect(x,y,2,2);
-});
-
-if(particles.length>1800){
-    particles=[];
-    fase="gota";
-    gota={x:W/2,y:0,vy:2};
-}
-```
-
 }
 
-/* =====================================================
-GOTA ROJA
-===================================================== */
-function dibujarGota(){
-gota.y += gota.vy;
-gota.vy += 0.05;
+// Animación partículas: océano → corazón
+let startTime = null;
+
+function animateParticles(timestamp) {
+if (!startTime) startTime = timestamp;
+const elapsed = (timestamp - startTime) / 1000;
 
 ```
-ctx.fillStyle="red";
-ctx.beginPath();
-ctx.arc(gota.x, gota.y, 6, 0, Math.PI*2);
-ctx.fill();
+pctx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
 
-if(gota.y > H*0.8){
-    fase="onda";
-    ondas.push({r:10});
-}
-```
+particles.forEach(p => {
 
-}
+    if (phase === "ocean") {
+        p.vy += 0.02;
+        p.x += p.vx;
+        p.y += p.vy;
 
-/* =====================================================
-ONDAS
-===================================================== */
-function dibujarOndas(){
-ondas.forEach(o=>{
-ctx.strokeStyle="rgba(0,0,0,0.7)";
-ctx.beginPath();
-ctx.arc(W/2,H*0.8,o.r,0,Math.PI*2);
-ctx.stroke();
-o.r+=3;
-});
+        // simular olas
+        p.y += Math.sin(p.x * 0.02 + elapsed * 3) * 0.5;
 
-```
-if(ondas[0].r>120){
-    fase="arbol";
-    ramas.push({x:W/2,y:H*0.8,angle:-Math.PI/2,len:160,depth:11});
-}
-```
-
-}
-
-/* =====================================================
-ARBOL FRONDOSO (tronco grueso)
-===================================================== */
-function crecerArbol(){
-ctx.strokeStyle="#5a341f";
-ctx.lineWidth=18;
-
-```
-let nuevas=[];
-ramas.forEach(r=>{
-    const x2=r.x+Math.cos(r.angle)*r.len;
-    const y2=r.y+Math.sin(r.angle)*r.len;
-
-    ctx.beginPath();
-    ctx.moveTo(r.x,r.y);
-    ctx.lineTo(x2,y2);
-    ctx.stroke();
-
-    if(r.depth>0){
-        nuevas.push({x:x2,y:y2,angle:r.angle+0.28,len:r.len*0.75,depth:r.depth-1});
-        nuevas.push({x:x2,y:y2,angle:r.angle-0.28,len:r.len*0.75,depth:r.depth-1});
-    }else{
-        for(let i=0;i<10;i++){
-            particles.push({
-                x:x2+Math.random()*20-10,
-                y:y2+Math.random()*20-10,
-                vy:Math.random()*0.3,
-                type:"hoja"
-            });
+        if (elapsed > 10) {
+            phase = "heart";
         }
     }
-});
 
-ramas=nuevas;
+    if (phase === "heart") {
+        // atraer al centro formando corazón
+        let t = Math.atan2(p.y - particleCanvas.height/2, p.x - particleCanvas.width/2);
+        let hx = 16 * Math.pow(Math.sin(t),3);
+        let hy = -(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t));
 
-if(ramas.length===0){
-    fase="nieve";
-    mostrarPoemaIzq();
-    iniciarContador();
-}
-```
+        hx = hx * 10 + particleCanvas.width/2;
+        hy = hy * 10 + particleCanvas.height/2;
 
-}
-
-/* =====================================================
-NIEVE
-===================================================== */
-function nieve(){
-particles.push({
-x:Math.random()*W,
-y:0,
-vy:Math.random()*1+0.5,
-type:"nieve"
-});
-}
-
-/* =====================================================
-POEMAS
-===================================================== */
-const poema1 = `Eres el destino que llegó sin aviso,
-la calma en medio del ruido del mundo,
-el instante donde el tiempo decide quedarse.
-
-Si la eternidad tuviera un rostro,
-sería tu mirada encontrando la mía.`;
-
-const poema2 = `Si el universo volviera a comenzar,
-volvería a buscarte entre millones de estrellas.
-
-Porque lo nuestro no es coincidencia,
-es destino…
-Fatum Amantis.`;
-
-function mostrarPoemaIzq(){
-const p=document.getElementById("poemaIzq");
-p.innerText=poema1;
-p.classList.add("visible");
-
-```
-setTimeout(()=>{
-    p.classList.remove("visible");
-    setTimeout(mostrarPoemaDer,4000);
-},9000);
-```
-
-}
-
-function mostrarPoemaDer(){
-const p=document.getElementById("poemaDer");
-p.innerText=poema2;
-p.classList.add("visible");
-
-```
-setTimeout(()=>{
-    p.classList.remove("visible");
-    cuentaRapida();
-},9000);
-```
-
-}
-
-/* =====================================================
-CONTADOR
-===================================================== */
-let tiempo = 30*86400 + 10*3600 + 5*60 + 39;
-const contador = document.getElementById("tiempo");
-
-function iniciarContador(){
-setInterval(actualizarTiempo,1000);
-}
-
-function cuentaRapida(){
-const fast=setInterval(()=>{
-tiempo-=400;
-if(tiempo<=0){
-tiempo=0;
-clearInterval(fast);
-fase="oceano";
-crearOceano();
-}
-actualizarTiempo();
-},30);
-}
-
-function actualizarTiempo(){
-let d=Math.floor(tiempo/86400);
-let h=Math.floor((tiempo%86400)/3600);
-let m=Math.floor((tiempo%3600)/60);
-let s=tiempo%60;
-contador.innerText=`${d}d ${h}h ${m}m ${s}s`;
-}
-
-/* =====================================================
-OCEANO DE PARTICULAS
-===================================================== */
-function crearOceano(){
-particles=[];
-for(let i=0;i<3500;i++){
-particles.push({
-x:Math.random()*W,
-y:H*0.6+Math.random()*H*0.4,
-color:Math.random()>0.5?"#4fc3f7":"#ffffff",
-type:"agua"
-});
-}
-
-```
-setTimeout(formarCorazon,10000);
-```
-
-}
-
-/* =====================================================
-CORAZON 3D
-===================================================== */
-function formarCorazon(){
-fase="corazon";
-
-```
-particles.forEach((p,i)=>{
-    let t=(i/particles.length)*Math.PI*2;
-    let x=16*Math.pow(Math.sin(t),3);
-    let y=-(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t));
-
-    p.tx=W/2+x*15;
-    p.ty=H/2+y*15;
-    p.z=Math.random()*200;
-});
-```
-
-}
-
-/* =====================================================
-LOOP PRINCIPAL
-===================================================== */
-function animar(){
-ctx.clearRect(0,0,W,H);
-
-```
-if(fase==="espiral") espiral();
-if(fase==="gota") dibujarGota();
-if(fase==="onda") dibujarOndas();
-if(fase==="arbol") crecerArbol();
-if(fase==="nieve") nieve();
-
-particles.forEach(p=>{
-    if(p.type==="nieve"||p.type==="hoja"){
-        p.y+=p.vy;
-        ctx.fillStyle=p.type==="hoja"?"#ff9ecb":"#ffffff";
-        ctx.fillRect(p.x,p.y,2,2);
+        p.x += (hx - p.x) * 0.02;
+        p.y += (hy - p.y) * 0.02;
     }
 
-    if(p.type==="agua"){
-        p.y+=Math.sin(Date.now()*0.002+p.x*0.01);
-        ctx.fillStyle=p.color;
-        ctx.fillRect(p.x,p.y,2,2);
-    }
-
-    if(fase==="corazon"){
-        p.x+=(p.tx-p.x)*0.04;
-        p.y+=(p.ty-p.y)*0.04;
-
-        let angle=Date.now()*0.001;
-        let dx=p.x-W/2;
-        let dz=p.z;
-
-        let rx=dx*Math.cos(angle)-dz*Math.sin(angle);
-        let rz=dx*Math.sin(angle)+dz*Math.cos(angle);
-
-        let scale=300/(300+rz);
-        ctx.fillStyle=p.color;
-        ctx.fillRect(W/2+rx*scale,p.y,2*scale,2*scale);
-    }
+    pctx.fillStyle = "rgba(150,200,255,0.8)";
+    pctx.fillRect(p.x, p.y, p.size, p.size);
 });
 
-requestAnimationFrame(animar);
+requestAnimationFrame(animateParticles);
 ```
 
 }
-animar();
+};
 
