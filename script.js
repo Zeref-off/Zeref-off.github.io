@@ -11,7 +11,7 @@ window.addEventListener("resize", resize);
 resize();
 
 /* =========================
-MATRIX INICIO (LETRAS GRANDES)
+MATRIX INICIO
 ========================= */
 
 const text = "Fatum Amantis";
@@ -61,18 +61,15 @@ animar();
 }
 
 /* =========================
-VARIABLES ESCENA
+VARIABLES
 ========================= */
 
 let waves=[];
 let treeProgress=0;
 let snow=[];
 let ocean=[];
-let heart=[];
-let treeParticles=[];
 let timeTotal = 30*86400 + 10*3600 + 5*60 + 39;
 
-/* nieve */
 for(let i=0;i<300;i++){
 snow.push({
 x:Math.random()*sceneCanvas.width,
@@ -82,7 +79,7 @@ s:Math.random()*2
 }
 
 /* =========================
-LOOP GENERAL
+LOOP
 ========================= */
 
 function animar(){
@@ -102,7 +99,6 @@ phase="drop";
 }
 }
 
-/* GOTA */
 else if(phase==="drop"){
 dropY+=3;
 ctx.fillStyle="red";
@@ -116,7 +112,6 @@ phase="wave";
 }
 }
 
-/* ONDAS */
 else if(phase==="wave"){
 waves.forEach(w=>{
 ctx.strokeStyle="rgba(0,160,255,0.6)";
@@ -128,39 +123,31 @@ w.r+=3;
 if(waves[0].r>240) phase="tree";
 }
 
-/* ARBOL */
 else if(phase==="tree"){
 treeProgress+=0.0025;
 drawTree(sceneCanvas.width/2,sceneCanvas.height-70,-90,220*treeProgress);
 drawSnow();
 
 if(treeProgress>=1){
-mostrarPoemas();
 phase="poems";
+iniciarPoemas();
 }
 }
 
-/* ARBOL ESTÁTICO MIENTRAS POEMAS */
 else if(phase==="poems"){
 drawTree(sceneCanvas.width/2,sceneCanvas.height-70,-90,220);
 drawSnow();
 }
 
-/* DESINTEGRACIÓN */
-else if(phase==="disintegrate"){
+else if(phase==="ocean"){
 drawOcean();
-}
-
-/* CORAZÓN */
-else if(phase==="heart"){
-drawHeart();
 }
 
 requestAnimationFrame(animar);
 }
 
 /* =========================
-ÁRBOL MUY FRONDOSO
+ÁRBOL
 ========================= */
 
 function drawTree(x,y,angle,length){
@@ -176,18 +163,13 @@ ctx.moveTo(x,y);
 ctx.lineTo(x2,y2);
 ctx.stroke();
 
-/* más ramas */
 drawTree(x2,y2,angle-15,length*0.75);
 drawTree(x2,y2,angle+15,length*0.75);
 drawTree(x2,y2,angle,length*0.72);
 
-/* hojas rosadas densas */
 if(length<14){
 ctx.fillStyle="#ff8fab";
 ctx.fillRect(x2,y2,3,3);
-if(Math.random()>0.6){
-ctx.fillRect(x2+2,y2,2,2);
-}
 }
 }
 
@@ -205,54 +187,68 @@ if(s.y>sceneCanvas.height) s.y=0;
 }
 
 /* =========================
-POEMAS
+POEMAS (SUBEN Y DESAPARECEN)
 ========================= */
 
-const poema1=`Eres el destino que no busqué,
+const poema1 = `Eres el destino que no busqué,
 pero que mi alma reconoció.
-En cada latido tuyo
-mi mundo encontró su lugar.
+Cada latido tuyo
+es el hogar de mi tiempo.
+Si el mundo se apagara,
+seguiría viviendo
+en la luz de tu mirada.`;
 
-Si el tiempo se detuviera,
-seguiría viviendo en tu mirada,
-porque en ella
-descubrí lo eterno.`;
-
-const poema2=`Si el universo volviera a nacer,
-volvería a elegir tu camino.
-Porque no hay estrella,
-ni luz, ni infinito
+const poema2 = `Si el universo volviera a empezar,
+volvería a encontrarte.
+Porque no existe estrella
+ni infinito
 que brille más que tu presencia.
-
 Mi amor por ti
-no pertenece al tiempo,
 pertenece al destino.`;
 
-function mostrarPoemas(){
-let left=document.getElementById("poemaLeft");
-let right=document.getElementById("poemaRight");
 
-left.innerText=poema1;
-left.style.opacity=1;
+function animarPoema(elemento, texto, lado, callback){
+elemento.innerText = texto;
+elemento.style.opacity = 1;
+elemento.style.top = "65%";
+elemento.style.transition = "none";
 
-setTimeout(()=>{
-left.style.opacity=0;
-right.innerText=poema2;
-right.style.opacity=1;
+if(lado==="left") elemento.style.left="5%";
+if(lado==="right") elemento.style.right="5%";
 
-setTimeout(()=>{
-right.style.opacity=0;
+let pos = 65;
+let op = 1;
+
+let anim = setInterval(()=>{
+pos -= 0.15;
+op -= 0.002;
+
+elemento.style.top = pos + "%";
+elemento.style.opacity = op;
+
+if(op <= 0){
+clearInterval(anim);
+callback();
+}
+},30);
+}
+
+function iniciarPoemas(){
+let left = document.getElementById("poemaLeft");
+let right = document.getElementById("poemaRight");
+
+animarPoema(left, poema1, "left", ()=>{
+animarPoema(right, poema2, "right", ()=>{
 iniciarCuentaFinal();
-},9000);
-
-},9000);
+});
+});
 }
 
 /* =========================
 CONTADOR
 ========================= */
 
-const timeEl=document.getElementById("time");
+const timeEl = document.getElementById("time");
 
 setInterval(()=>{
 if(timeTotal>0){
@@ -271,75 +267,44 @@ let s=t%60;
 return `${d}d ${h}h ${m}m ${s}s`;
 }
 
-/* aceleración final */
+/* reducción abrupta */
 function iniciarCuentaFinal(){
-let fast=setInterval(()=>{
-timeTotal-=500;
-if(timeTotal<=0){
-timeTotal=0;
+let fast = setInterval(()=>{
+timeTotal -= 2000;
+if(timeTotal <= 0){
+timeTotal = 0;
 clearInterval(fast);
-crearOceanDesdeArbol();
-phase="disintegrate";
-
-setTimeout(()=>{
-crearHeart();
-phase="heart";
-},10000);
+crearOcean();
+phase="ocean";
 }
-},30);
+},20);
 }
 
 /* =========================
-ARBOL → OCEANO
+OCÉANO ESPECTACULAR
 ========================= */
 
-function crearOceanDesdeArbol(){
-for(let i=0;i<3500;i++){
+function crearOcean(){
+ocean=[];
+for(let i=0;i<5000;i++){
 ocean.push({
-x:sceneCanvas.width/2 + (Math.random()-0.5)*200,
-y:sceneCanvas.height/2,
-vy:Math.random()*2+1,
-color:Math.random()>0.5 ? "rgba(0,180,255,0.8)" : "rgba(255,255,255,0.8)"
+x:Math.random()*sceneCanvas.width,
+y:sceneCanvas.height/2 + Math.random()*sceneCanvas.height/2,
+baseY:Math.random()*sceneCanvas.height/2,
+speed:Math.random()*0.5+0.2,
+color:Math.random()>0.8 ? "rgba(255,255,255,0.9)" : "rgba(0,150,255,0.8)"
 });
 }
 }
 
 function drawOcean(){
+let time = Date.now()*0.002;
+
 ocean.forEach(p=>{
-p.y+=p.vy;
-p.y+=Math.sin(Date.now()*0.002+p.x)*0.5;
-ctx.fillStyle=p.color;
+p.y = sceneCanvas.height/2 + p.baseY + Math.sin(time + p.x*0.01)*20;
+ctx.fillStyle = p.color;
 ctx.fillRect(p.x,p.y,2,2);
 });
 }
 
-/* =========================
-CORAZÓN 3D RELLENO
-========================= */
-
-function crearHeart(){
-heart=[];
-for(let t=0;t<Math.PI*2;t+=0.02){
-for(let z=-80;z<80;z+=3){
-let x=16*Math.pow(Math.sin(t),3);
-let y=-(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t));
-heart.push({x:x*10,y:y*10,z});
-}
-}
-}
-
-function drawHeart(){
-let time=Date.now()*0.001;
-ctx.fillStyle="rgba(0,200,255,0.9)";
-heart.forEach(p=>{
-let rx=p.x*Math.cos(time)-p.z*Math.sin(time);
-let rz=p.x*Math.sin(time)+p.z*Math.cos(time);
-let scale=400/(400+rz);
-ctx.fillRect(
-sceneCanvas.width/2+rx*scale,
-sceneCanvas.height/2+p.y*scale,
-2,2
-);
-});
-}
 
