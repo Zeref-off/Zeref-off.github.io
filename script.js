@@ -139,8 +139,8 @@ let pos=65;
 let op=1;
 
 let anim=setInterval(()=>{
-pos-=0.6;
-op-=0.015;
+pos-=0.15;
+op-=0.002;
 
 elemento.style.top=pos+"%";
 elemento.style.opacity=op;
@@ -149,7 +149,7 @@ if(op<=0){
 clearInterval(anim);
 callback();
 }
-},20);
+},30);
 }
 
 // ========================
@@ -179,7 +179,7 @@ return `${d}d ${h}h ${m}m ${s}s`;
 // Cuenta regresiva rápida al final
 function iniciarCuentaFinal(){
 let fast=setInterval(()=>{
-timeTotal-=20000;
+timeTotal-=5000;
 
 if(timeTotal<=0){
 timeTotal=0;
@@ -187,7 +187,7 @@ timeEl.innerText=formatTime(timeTotal);
 clearInterval(fast);
 phase="ocean";
 }
-},10);
+},20);
 }
 
 // ========================
@@ -233,6 +233,7 @@ drawOcean();
 
 requestAnimationFrame(animar);
 }
+
 
 
 
