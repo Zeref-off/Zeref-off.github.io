@@ -1,3 +1,7 @@
+// ========================
+// CANVAS
+// ========================
+
 const matrixCanvas = document.getElementById("matrixCanvas");
 const sceneCanvas = document.getElementById("sceneCanvas");
 const mCtx = matrixCanvas.getContext("2d");
@@ -10,17 +14,17 @@ matrixCanvas.height = sceneCanvas.height = window.innerHeight;
 window.addEventListener("resize", resize);
 resize();
 
-/* =========================
-MATRIX INICIO
-========================= */
+// ========================
+// MATRIX INICIO
+// ========================
 
 const text = "Fatum Amantis";
-const fontSize = 22;
-const cols = Math.floor(matrixCanvas.width / fontSize);
+const fontSize = 26;
+let cols = Math.floor(matrixCanvas.width / fontSize);
 let drops = Array(cols).fill(0);
 
 function drawMatrix(){
-mCtx.fillStyle = "rgba(0,0,0,0.08)";
+mCtx.fillStyle = "rgba(0,0,0,0.07)";
 mCtx.fillRect(0,0,matrixCanvas.width,matrixCanvas.height);
 
 mCtx.fillStyle = "#ff4d6d";
@@ -30,225 +34,130 @@ for(let i=0;i<drops.length;i++){
 let char = text[Math.floor(Math.random()*text.length)];
 mCtx.fillText(char, i*fontSize, drops[i]*fontSize);
 
-if(drops[i]*fontSize > matrixCanvas.height && Math.random()>0.96){
+if(drops[i]*fontSize > matrixCanvas.height && Math.random()>0.97){
 drops[i]=0;
 }
 drops[i]++;
 }
 }
-setInterval(drawMatrix,100);
+setInterval(drawMatrix,90);
 
-/* =========================
-TRANSICIÓN
-========================= */
+// ========================
+// FASES
+// ========================
 
 let phase="idle";
-let spiralParticles=[];
-let dropY=0;
 
 function iniciar(){
 document.getElementById("screenInicio").classList.remove("active");
 document.getElementById("screenScene").classList.add("active");
 
-for(let i=0;i<2500;i++){
-spiralParticles.push({
-angle:Math.random()*Math.PI*2,
-radius:Math.random()*sceneCanvas.width
-});
-}
-phase="spiral";
+phase="poems";
 animar();
+iniciarPoemas();
 }
 
-/* =========================
-VARIABLES
-========================= */
+// ========================
+// NIEVE (SIEMPRE ACTIVA)
+// ========================
 
-let waves=[];
-let treeProgress=0;
 let snow=[];
-let ocean=[];
-let timeTotal = 30*86400 + 10*3600 + 5*60 + 39;
 
-for(let i=0;i<300;i++){
+for(let i=0;i<400;i++){
 snow.push({
 x:Math.random()*sceneCanvas.width,
 y:Math.random()*sceneCanvas.height,
-s:Math.random()*2
+s:Math.random()*2+1,
+v:Math.random()*1+0.5
 });
 }
-
-/* =========================
-LOOP
-========================= */
-
-function animar(){
-ctx.clearRect(0,0,sceneCanvas.width,sceneCanvas.height);
-
-if(phase==="spiral"){
-ctx.fillStyle="rgba(255,0,80,0.5)";
-spiralParticles.forEach(p=>{
-p.radius*=0.965;
-p.angle+=0.15;
-let x=sceneCanvas.width/2 + Math.cos(p.angle)*p.radius;
-let y=sceneCanvas.height/2 + Math.sin(p.angle)*p.radius;
-ctx.fillRect(x,y,2,2);
-});
-if(spiralParticles[0].radius<2){
-phase="drop";
-}
-}
-
-else if(phase==="drop"){
-dropY+=3;
-ctx.fillStyle="red";
-ctx.beginPath();
-ctx.arc(sceneCanvas.width/2,dropY,6,0,Math.PI*2);
-ctx.fill();
-
-if(dropY>sceneCanvas.height-70){
-for(let i=0;i<6;i++) waves.push({r:0});
-phase="wave";
-}
-}
-
-else if(phase==="wave"){
-waves.forEach(w=>{
-ctx.strokeStyle="rgba(0,160,255,0.6)";
-ctx.beginPath();
-ctx.arc(sceneCanvas.width/2,sceneCanvas.height-70,w.r,0,Math.PI*2);
-ctx.stroke();
-w.r+=3;
-});
-if(waves[0].r>240) phase="tree";
-}
-
-else if(phase==="tree"){
-treeProgress+=0.0025;
-drawTree(sceneCanvas.width/2,sceneCanvas.height-70,-90,220*treeProgress);
-drawSnow();
-
-if(treeProgress>=1){
-phase="poems";
-iniciarPoemas();
-}
-}
-
-else if(phase==="poems"){
-drawTree(sceneCanvas.width/2,sceneCanvas.height-70,-90,220);
-drawSnow();
-}
-
-else if(phase==="ocean"){
-drawOcean();
-}
-
-requestAnimationFrame(animar);
-}
-
-/* =========================
-ÁRBOL
-========================= */
-
-function drawTree(x,y,angle,length){
-if(length<6) return;
-
-let x2=x+Math.cos(angle*Math.PI/180)*length;
-let y2=y+Math.sin(angle*Math.PI/180)*length;
-
-ctx.strokeStyle="#5b3a29";
-ctx.lineWidth=2;
-ctx.beginPath();
-ctx.moveTo(x,y);
-ctx.lineTo(x2,y2);
-ctx.stroke();
-
-drawTree(x2,y2,angle-15,length*0.75);
-drawTree(x2,y2,angle+15,length*0.75);
-drawTree(x2,y2,angle,length*0.72);
-
-if(length<14){
-ctx.fillStyle="#ff8fab";
-ctx.fillRect(x2,y2,3,3);
-}
-}
-
-/* =========================
-NIEVE
-========================= */
 
 function drawSnow(){
-ctx.fillStyle="white";
+ctx.fillStyle="rgba(255,255,255,0.9)";
 snow.forEach(s=>{
 ctx.fillRect(s.x,s.y,s.s,s.s);
-s.y+=1;
-if(s.y>sceneCanvas.height) s.y=0;
+s.y+=s.v;
+s.x+=Math.sin(Date.now()*0.001+s.y)*0.2;
+
+if(s.y>sceneCanvas.height){
+s.y=0;
+s.x=Math.random()*sceneCanvas.width;
+}
 });
 }
 
-/* =========================
-POEMAS (SUBEN Y DESAPARECEN)
-========================= */
+// ========================
+// POEMAS
+// ========================
 
-const poema1 = `Eres el destino que no busqué,
-pero que mi alma reconoció.
-Cada latido tuyo
-es el hogar de mi tiempo.
-Si el mundo se apagara,
-seguiría viviendo
-en la luz de tu mirada.`;
+const poema1 = `En el silencio del tiempo te encontré,
+como el mar encuentra la orilla cada día.
+No te busqué…
+pero mi alma ya sabía tu nombre.
 
-const poema2 = `Si el universo volviera a empezar,
-volvería a encontrarte.
-Porque no existe estrella
-ni infinito
-que brille más que tu presencia.
-Mi amor por ti
-pertenece al destino.`;
+Desde entonces,
+cada latido tiene tu forma,
+cada instante tu luz,
+y cada sueño tu presencia.`;
 
+const poema2 = `Si el destino volviera a comenzar,
+te elegiría en cada universo,
+en cada vida,
+en cada historia posible.
 
-function animarPoema(elemento, texto, lado, callback){
-elemento.innerText = texto;
-elemento.style.opacity = 1;
-elemento.style.top = "65%";
-elemento.style.transition = "none";
+Porque amarte no es un momento…
+es una eternidad
+que decidió quedarse conmigo.`;
 
-if(lado==="left") elemento.style.left="5%";
-if(lado==="right") elemento.style.right="5%";
+function iniciarPoemas(){
+let left=document.getElementById("poemaLeft");
+let right=document.getElementById("poemaRight");
 
-let pos = 65;
-let op = 1;
+animarPoema(left,poema1,"left",()=>{
+animarPoema(right,poema2,"right",()=>{
+iniciarCuentaFinal();
+});
+});
+}
 
-let anim = setInterval(()=>{
-pos -= 0.5;
-op -= 0.01;
+// Aparición desde abajo y desaparición mientras sube
+function animarPoema(elemento,texto,lado,callback){
+elemento.innerText=texto;
+elemento.style.opacity=1;
+elemento.style.top="65%";
 
-elemento.style.top = pos + "%";
-elemento.style.opacity = op;
+if(lado==="left"){
+elemento.style.left="5%";
+elemento.style.right="";
+}
+if(lado==="right"){
+elemento.style.right="5%";
+elemento.style.left="";
+}
 
-if(op <= 0){
+let pos=65;
+let op=1;
+
+let anim=setInterval(()=>{
+pos-=0.6;
+op-=0.015;
+
+elemento.style.top=pos+"%";
+elemento.style.opacity=op;
+
+if(op<=0){
 clearInterval(anim);
 callback();
 }
 },20);
 }
 
-function iniciarPoemas(){
-let left = document.getElementById("poemaLeft");
-let right = document.getElementById("poemaRight");
+// ========================
+// CONTADOR
+// ========================
 
-animarPoema(left, poema1, "left", ()=>{
-animarPoema(right, poema2, "right", ()=>{
-iniciarCuentaFinal();
-});
-});
-}
-
-/* =========================
-CONTADOR
-========================= */
-
-const timeEl = document.getElementById("time");
+let timeTotal = 30*86400 + 10*3600 + 5*60 + 39;
+const timeEl=document.getElementById("time");
 
 setInterval(()=>{
 if(timeTotal>0){
@@ -267,45 +176,65 @@ let s=t%60;
 return `${d}d ${h}h ${m}m ${s}s`;
 }
 
-/* reducción abrupta */
+// Cuenta regresiva rápida al final
 function iniciarCuentaFinal(){
-let fast = setInterval(()=>{
-timeTotal -= 10000;
-if(timeTotal <= 0){
-timeTotal = 0;
+let fast=setInterval(()=>{
+timeTotal-=20000;
+
+if(timeTotal<=0){
+timeTotal=0;
+timeEl.innerText=formatTime(timeTotal);
 clearInterval(fast);
-crearOcean();
 phase="ocean";
 }
 },10);
 }
 
-/* =========================
-OCÉANO ESPECTACULAR
-========================= */
+// ========================
+// OCEANO CINEMATOGRÁFICO
+// ========================
 
-function crearOcean(){
-ocean=[];
+let oceanParticles=[];
+
 for(let i=0;i<5000;i++){
-ocean.push({
+oceanParticles.push({
 x:Math.random()*sceneCanvas.width,
-y:sceneCanvas.height/2 + Math.random()*sceneCanvas.height/2,
-baseY:Math.random()*sceneCanvas.height/2,
-speed:Math.random()*0.5+0.2,
-color:Math.random()>0.8 ? "rgba(255,255,255,0.9)" : "rgba(0,150,255,0.8)"
+y:sceneCanvas.height*0.6 + Math.random()*sceneCanvas.height*0.4,
+color: Math.random()>0.8 ? "white" : "rgba(0,120,255,0.8)"
 });
-}
 }
 
 function drawOcean(){
-let time = Date.now()*0.002;
+let time=Date.now()*0.002;
 
-ocean.forEach(p=>{
-p.y = sceneCanvas.height/2 + p.baseY + Math.sin(time + p.x*0.01)*20;
-ctx.fillStyle = p.color;
+oceanParticles.forEach(p=>{
+let wave1=Math.sin(p.x*0.01 + time)*6;
+let wave2=Math.sin(p.x*0.02 + time*1.5)*4;
+
+p.y += (wave1+wave2)*0.02;
+
+ctx.fillStyle=p.color;
 ctx.fillRect(p.x,p.y,2,2);
 });
 }
+
+// ========================
+// LOOP GENERAL
+// ========================
+
+function animar(){
+ctx.clearRect(0,0,sceneCanvas.width,sceneCanvas.height);
+
+drawSnow();
+
+if(phase==="ocean"){
+drawOcean();
+}
+
+requestAnimationFrame(animar);
+}
+
+
 
 
 
