@@ -220,8 +220,8 @@ let pos = 65;
 let op = 1;
 
 let anim = setInterval(()=>{
-pos -= 0.15;
-op -= 0.002;
+pos -= 0.5;
+op -= 0.01;
 
 elemento.style.top = pos + "%";
 elemento.style.opacity = op;
@@ -230,7 +230,7 @@ if(op <= 0){
 clearInterval(anim);
 callback();
 }
-},30);
+},20);
 }
 
 function iniciarPoemas(){
@@ -270,14 +270,14 @@ return `${d}d ${h}h ${m}m ${s}s`;
 /* reducción abrupta */
 function iniciarCuentaFinal(){
 let fast = setInterval(()=>{
-timeTotal -= 2000;
+timeTotal -= 10000;
 if(timeTotal <= 0){
 timeTotal = 0;
 clearInterval(fast);
 crearOcean();
 phase="ocean";
 }
-},20);
+},10);
 }
 
 /* =========================
@@ -306,5 +306,6 @@ ctx.fillStyle = p.color;
 ctx.fillRect(p.x,p.y,2,2);
 });
 }
+
 
 
