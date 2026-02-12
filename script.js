@@ -179,44 +179,109 @@ return `${d}d ${h}h ${m}m ${s}s`;
 // Cuenta regresiva rápida al final
 function iniciarCuentaFinal(){
 let fast=setInterval(()=>{
-timeTotal-=5000;
+timeTotal-=30000;
 
 if(timeTotal<=0){
 timeTotal=0;
 timeEl.innerText=formatTime(timeTotal);
 clearInterval(fast);
+
+/* Ocultar textos */
+document.getElementById("poemaLeft").style.display="none";
+document.getElementById("poemaRight").style.display="none";
+document.getElementById("contador").style.display="none";
+
+/* Activar océano */
 phase="ocean";
 }
 },20);
 }
 
-// ========================
-// OCEANO CINEMATOGRÁFICO
-// ========================
 
-let oceanParticles=[];
+/* ========================
+OCEANO REALISTA CINEMATOGRÁFICO
+======================== */
 
-for(let i=0;i<5000;i++){
-oceanParticles.push({
+let foam=[];
+
+/* partículas de espuma */
+for(let i=0;i<800;i++){
+foam.push({
 x:Math.random()*sceneCanvas.width,
-y:sceneCanvas.height*0.6 + Math.random()*sceneCanvas.height*0.4,
-color: Math.random()>0.8 ? "white" : "rgba(0,120,255,0.8)"
+y:sceneCanvas.height,
+life:Math.random()*100
 });
 }
 
 function drawOcean(){
-let time=Date.now()*0.002;
 
-oceanParticles.forEach(p=>{
-let wave1=Math.sin(p.x*0.01 + time)*6;
-let wave2=Math.sin(p.x*0.02 + time*1.5)*4;
+let time = Date.now()*0.0008;
 
-p.y += (wave1+wave2)*0.02;
+/* Fondo oscuro profundo */
+let gradient = ctx.createLinearGradient(0, sceneCanvas.height*0.5, 0, sceneCanvas.height);
+gradient.addColorStop(0, "#020a18");
+gradient.addColorStop(0.5, "#041a3a");
+gradient.addColorStop(1, "#062a5c");
+ctx.fillStyle = gradient;
+ctx.fillRect(0, sceneCanvas.height*0.5, sceneCanvas.width, sceneCanvas.height);
 
-ctx.fillStyle=p.color;
-ctx.fillRect(p.x,p.y,2,2);
+/* Capas de olas (interferencia) */
+for(let layer=0; layer<4; layer++){
+
+ctx.beginPath();
+ctx.moveTo(0, sceneCanvas.height);
+
+for(let x=0; x<sceneCanvas.width; x+=6){
+
+let y =
+sceneCanvas.height*0.65
+
+* Math.sin(x*0.008 + time*(1+layer*0.3))*20
+* Math.sin(x*0.015 + time*(1.5+layer*0.2))*10
+* layer*12;
+
+ctx.lineTo(x,y);
+}
+
+ctx.lineTo(sceneCanvas.width, sceneCanvas.height);
+ctx.closePath();
+
+/* color por profundidad */
+ctx.fillStyle = `rgba(0,120,255,${0.25 + layer*0.1})`;
+ctx.fill();
+}
+
+/* ========================
+ESPUMA DE OLAS
+======================== */
+
+ctx.fillStyle="rgba(255,255,255,0.9)";
+
+foam.forEach(f=>{
+
+/* superficie dinámica */
+let surface =
+sceneCanvas.height*0.65
+
+* Math.sin(f.x*0.008 + time)*20
+* Math.sin(f.x*0.015 + time*1.5)*10;
+
+f.y += (surface - f.y)*0.05;
+f.x += Math.sin(time + f.y)*0.3;
+f.life--;
+
+ctx.fillRect(f.x,f.y,2,2);
+
+/* regenerar */
+if(f.life<=0){
+f.x=Math.random()*sceneCanvas.width;
+f.y=sceneCanvas.height*0.65;
+f.life=80+Math.random()*60;
+}
+
 });
 }
+
 
 // ========================
 // LOOP GENERAL
@@ -233,6 +298,7 @@ drawOcean();
 
 requestAnimationFrame(animar);
 }
+
 
 
 
