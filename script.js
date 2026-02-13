@@ -1,5 +1,11 @@
 window.onload = function(){
 
+let oceanParticles = [];
+let heartParticles = [];
+let oceanPhase = "ocean"; // ocean → rise → heart
+let cameraOffset = 0;
+
+  
 /* ================= CANVAS ================= */
 
 const matrixCanvas = document.getElementById("matrixCanvas");
@@ -169,12 +175,13 @@ drawOcean();
 
 function drawOcean(){
 
-let particles=[];
 let W = sceneCanvas.width;
 let H = sceneCanvas.height;
 
-for(let i=0;i<2200;i++){
-particles.push({
+oceanParticles = [];
+
+for(let i=0;i<2500;i++){
+oceanParticles.push({
 x:Math.random()*W,
 y:Math.random()*H,
 layer:Math.floor(Math.random()*3)
@@ -182,27 +189,53 @@ layer:Math.floor(Math.random()*3)
 }
 
 let t=0;
+let phaseTime = 0;
 
 function animarOcean(){
-ctx.clearRect(0,0,W,H);
-t+=0.02;
 
-particles.forEach(p=>{
+ctx.clearRect(0,0,W,H);
+
+t += 0.02;
+phaseTime += 1;
+
+/* ===== TRANSICIÓN DE CÁMARA ===== */
+if(phaseTime > 300 && cameraOffset < 80){
+cameraOffset += 0.2; // sensación de alejamiento
+}
+
+/* ===== FONDO OSCURO AZUL ===== */
+ctx.fillStyle = "rgba(0,10,30,0.4)";
+ctx.fillRect(0,0,W,H);
+
+/* ===== LUNA ===== */
+if(phaseTime > 400){
+let moonY = 120 - cameraOffset;
+let grad = ctx.createRadialGradient(W/2, moonY, 10, W/2, moonY, 80);
+grad.addColorStop(0,"rgba(220,240,255,0.9)");
+grad.addColorStop(1,"rgba(220,240,255,0)");
+ctx.fillStyle = grad;
+ctx.beginPath();
+ctx.arc(W/2, moonY, 60, 0, Math.PI*2);
+ctx.fill();
+}
+
+/* ===== OCEANO ===== */
+oceanParticles.forEach(p=>{
 
 let depth = (p.layer+1)/3;
 
 let wave =
 Math.sin(p.x*0.004 + t)*40*depth +
-Math.sin(p.x*0.01 + t*1.5)*15*depth;
+Math.sin(p.x*0.01 + t*1.6)*18*depth;
 
-let base = H*0.4 + p.layer*40;
+let base = H*0.45 + p.layer*40 + cameraOffset;
 p.y += (base + wave - p.y)*0.05;
 
 let crest = wave;
 
 let color;
-if(crest > 25){
-color = "rgba(200,230,255,0.9)";
+if(crest > 28){
+color = "rgba(220,240,255,0.9)"; // espuma
 }else{
 let blue = 120 + p.layer*40;
 color = `rgba(0,${blue},255,0.8)`;
@@ -210,7 +243,24 @@ color = `rgba(0,${blue},255,0.8)`;
 
 ctx.fillStyle=color;
 ctx.fillRect(p.x,p.y,2,2);
+
+/* ===== TRANSICIÓN A CORAZÓN ===== */
+if(phaseTime > 700){
+p.y -= (p.y - H/2)*0.002;
+p.x -= (p.x - W/2)*0.002;
+}
+
 });
+
+/* ===== CREAR CORAZÓN ===== */
+if(phaseTime === 900){
+crearHeart();
+oceanPhase = "heart";
+}
+
+if(oceanPhase === "heart"){
+drawHeart();
+}
 
 requestAnimationFrame(animarOcean);
 }
@@ -218,7 +268,47 @@ requestAnimationFrame(animarOcean);
 animarOcean();
 }
 
+  function crearHeart(){
+heartParticles = [];
+
+for(let t=0; t<Math.PI*2; t+=0.02){
+for(let z=-60; z<60; z+=4){
+
+let x = 16*Math.pow(Math.sin(t),3);
+let y = -(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t));
+
+heartParticles.push({
+x:x*12,
+y:y*12,
+z:z
+});
+}
+}
+}
+
+function drawHeart(){
+
+let time = Date.now()*0.001;
+
+ctx.fillStyle="rgba(0,180,255,0.9)";
+
+heartParticles.forEach(p=>{
+
+let rx = p.x*Math.cos(time) - p.z*Math.sin(time);
+let rz = p.x*Math.sin(time) + p.z*Math.cos(time);
+
+let scale = 400/(400+rz);
+
+ctx.fillRect(
+sceneCanvas.width/2 + rx*scale,
+sceneCanvas.height/2 + p.y*scale,
+2,2
+);
+});
+}
+
 };
+
 
 
 
