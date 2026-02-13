@@ -72,20 +72,6 @@ v:Math.random()*1+0.5
 });
 }
 
-function drawSnow(){
-ctx.fillStyle="rgba(255,255,255,0.9)";
-snow.forEach(s=>{
-ctx.fillRect(s.x,s.y,s.s,s.s);
-s.y+=s.v;
-s.x+=Math.sin(Date.now()*0.001+s.y)*0.2;
-
-if(s.y>sceneCanvas.height){
-s.y=0;
-s.x=Math.random()*sceneCanvas.width;
-}
-});
-}
-
 // ========================
 // POEMAS
 // ========================
@@ -365,6 +351,7 @@ drawOcean();
 
 requestAnimationFrame(animar);
 }
+
 
 
 
