@@ -1,6 +1,5 @@
 /* ==========================================
-   FATUM AMANTIS – TRANSICION CORREGIDA
-   (Océano original + más partículas)
+   FATUM AMANTIS – CINE PREMIUM
 ========================================== */
 
 const screenInicio = document.getElementById("screenInicio");
@@ -36,14 +35,25 @@ window.addEventListener("resize", resize);
 resize();
 
 /* ==========================================
-   CONTROL DE ESTADOS
+   AUDIO AMBIENTAL (olas)
 ========================================== */
 
-let estado = "inicio"; 
-// inicio → poemas → final
+const audioOlas = new Audio(
+"https://cdn.pixabay.com/download/audio/2022/03/15/audio_8f1a3e7c42.mp3?filename=ocean-waves-ambient-110624.mp3"
+);
+audioOlas.loop = true;
+audioOlas.volume = 0.35;
 
 /* ==========================================
-   MATRIX (pantalla 1)
+   ESTADOS
+========================================== */
+
+let estado = "inicio"; // inicio → poemas → fade → final
+let fadeAlpha = 0;
+let fadeOut = false;
+
+/* ==========================================
+   MATRIX
 ========================================== */
 
 const matrixText = "Fatum Amantis";
@@ -70,18 +80,17 @@ function drawMatrix(){
         drops[i]++;
     }
 }
-
 setInterval(drawMatrix, 60);
 
 /* ==========================================
-   NIEVE (pantalla 2)
+   NIEVE
 ========================================== */
 
 let snow = [];
 
 function initSnow(){
     snow = [];
-    for(let i=0;i<220;i++){
+    for(let i=0;i<240;i++){
         snow.push({
             x: Math.random()*W,
             y: Math.random()*H,
@@ -110,13 +119,17 @@ function drawSnow(){
    POEMAS
 ========================================== */
 
-const texto1 = `Eres el instante
-donde el tiempo respira,
-la calma entre mis latidos.`;
+const texto1 =
+`Eres el instante donde el tiempo respira,
+la pausa entre mis latidos,
+el destino que llegó sin avisar
+y decidió quedarse.`;
 
-const texto2 = `Y si el mundo termina,
-que sea contigo,
-mirando el mar infinito.`;
+const texto2 =
+`Y si el mundo terminara mañana,
+volvería a encontrarte,
+porque mi universo
+comienza y termina en ti.`;
 
 function escribirPoema(el, texto, velocidad, callback){
     el.style.opacity = 1;
@@ -133,16 +146,16 @@ function escribirPoema(el, texto, velocidad, callback){
             setTimeout(()=>{
                 el.style.opacity = 0;
                 if(callback) callback();
-            },1200);
+            },900);
         }
     }, velocidad);
 }
 
 /* ==========================================
-   CONTADOR (rápido)
+   CONTADOR RÁPIDO
 ========================================== */
 
-let tiempoTotal = 15000;
+let tiempoTotal = 12000;
 let contadorActivo = false;
 
 function iniciarContador(){
@@ -152,15 +165,12 @@ function iniciarContador(){
 function actualizarContador(){
     if(!contadorActivo || estado === "final") return;
 
-    tiempoTotal -= 120; // más rápido
+    tiempoTotal -= 180;
 
     if(tiempoTotal <= 0){
         tiempoTotal = 0;
-        estado = "final";
-
-        poemaLeft.style.display="none";
-        poemaRight.style.display="none";
-        contadorEl.style.display="none";
+        contadorActivo = false;
+        iniciarFadeFinal();
     }
 
     let s = Math.floor(tiempoTotal/1000);
@@ -176,17 +186,16 @@ function actualizarContador(){
 ========================================== */
 
 function iniciar(){
-
     screenInicio.classList.remove("active");
     screenScene.classList.add("active");
 
     estado = "poemas";
 
     initSnow();
-    crearOceano(); // se prepara desde el inicio
+    crearOceano();
 
-    escribirPoema(poemaLeft, texto1, 18, ()=>{
-        escribirPoema(poemaRight, texto2, 18, ()=>{
+    escribirPoema(poemaLeft, texto1, 16, ()=>{
+        escribirPoema(poemaRight, texto2, 16, ()=>{
             iniciarContador();
         });
     });
@@ -196,8 +205,36 @@ function iniciar(){
 window.iniciar = iniciar;
 
 /* ==========================================
-   ====== OCEANO ORIGINAL ======
-   (solo MÁS partículas)
+   FADE CINEMATOGRAFICO
+========================================== */
+
+function iniciarFadeFinal(){
+    fadeOut = true;
+}
+
+function drawFade(){
+    if(!fadeOut) return;
+
+    fadeAlpha += 0.01;
+
+    ctx.fillStyle = `rgba(0,0,0,${fadeAlpha})`;
+    ctx.fillRect(0,0,W,H);
+
+    if(fadeAlpha >= 1){
+        estado = "final";
+        fadeOut = false;
+        fadeAlpha = 0;
+
+        poemaLeft.style.display="none";
+        poemaRight.style.display="none";
+        contadorEl.style.display="none";
+
+        audioOlas.play();
+    }
+}
+
+/* ==========================================
+   OCEANO PREMIUM (más partículas)
 ========================================== */
 
 let particulas = [];
@@ -206,54 +243,48 @@ let camX = 0;
 let camY = 0;
 
 function crearOceano(){
-
     particulas = [];
-    const capas = 6;
+
+    const capas = 7;
 
     for(let c = 0; c < capas; c++){
 
         let profundidad = c / capas;
+        let cantidad = 500 + c * 250; // muy denso
 
-        // 🔥 AUMENTO DE DENSIDAD (antes: 180 + c*100)
-        let cantidad = 400 + c * 220;
-
-        for(let i=0; i<cantidad; i++){
-
+        for(let i=0;i<cantidad;i++){
             particulas.push({
-                x: Math.random() * W,
-                baseY: H * (0.45 + profundidad * 0.55),
+                x: Math.random()*W,
+                baseY: H*(0.45 + profundidad*0.55),
                 profundidad: profundidad,
-                amp: 30 + profundidad * 120,
+                amp: 40 + profundidad*140,
                 freq: 0.0015 + Math.random()*0.002,
-                speed: 0.4 + profundidad * 1.8,
-                size: 1 + profundidad * 3,
-                fase: Math.random() * Math.PI * 2
+                speed: 0.4 + profundidad*2,
+                size: 1 + profundidad*3,
+                fase: Math.random()*Math.PI*2
             });
         }
     }
 }
 
 function ola(p, t){
-    let w1 = Math.sin(p.x * p.freq + t * p.speed + p.fase);
-    let w2 = Math.sin(p.x * p.freq * 0.5 + t * p.speed * 0.7);
-    let w3 = Math.sin(p.x * p.freq * 2 + t * p.speed * 1.2);
-    return p.baseY + (w1 + w2*0.6 + w3*0.3) * p.amp;
+    let w1 = Math.sin(p.x*p.freq + t*p.speed + p.fase);
+    let w2 = Math.sin(p.x*p.freq*0.5 + t*p.speed*0.7);
+    let w3 = Math.sin(p.x*p.freq*2 + t*p.speed*1.2);
+    return p.baseY + (w1 + w2*0.6 + w3*0.3)*p.amp;
 }
 
 function drawCielo(){
-
     let grad = ctx.createLinearGradient(0,0,0,H);
     grad.addColorStop(0,"#000814");
-    grad.addColorStop(0.5,"#001d3d");
     grad.addColorStop(1,"#00111f");
-
     ctx.fillStyle = grad;
     ctx.fillRect(0,0,W,H);
 
-    let moonX = W * 0.8;
-    let moonY = H * 0.15;
+    let moonX = W*0.8;
+    let moonY = H*0.15;
 
-    ctx.fillStyle = "#fff8cc";
+    ctx.fillStyle="#fff8cc";
     ctx.beginPath();
     ctx.arc(moonX, moonY, 40, 0, Math.PI*2);
     ctx.fill();
@@ -261,8 +292,8 @@ function drawCielo(){
 
 function drawOcean(){
 
-    camX = Math.sin(tiempo * 0.2) * 20;
-    camY = Math.sin(tiempo * 0.15) * 10;
+    camX = Math.sin(tiempo*0.15)*18;
+    camY = Math.sin(tiempo*0.12)*8;
 
     ctx.save();
     ctx.translate(camX, camY);
@@ -270,22 +301,23 @@ function drawOcean(){
     for(let p of particulas){
 
         let y = ola(p, tiempo);
-        p.x += p.profundidad * 0.4;
+
+        p.x += p.profundidad*0.4;
         if(p.x > W) p.x = 0;
 
-        let blue = 100 + p.profundidad * 120;
-        let alpha = 0.25 + p.profundidad * 0.6;
+        let blue = 100 + p.profundidad*130;
+        let alpha = 0.25 + p.profundidad*0.7;
 
-        ctx.fillStyle = `rgba(0, ${blue}, 255, ${alpha})`;
+        ctx.fillStyle = `rgba(0,${blue},255,${alpha})`;
         ctx.beginPath();
-        ctx.arc(p.x, y, p.size, 0, Math.PI*2);
+        ctx.arc(p.x,y,p.size,0,Math.PI*2);
         ctx.fill();
 
-        let crest = Math.sin(p.x * p.freq + tiempo * p.speed + p.fase);
-        if(crest > 0.93 && p.profundidad > 0.6){
-            ctx.fillStyle = `rgba(255,255,255,${(crest-0.9)*6})`;
+        let crest = Math.sin(p.x*p.freq + tiempo*p.speed + p.fase);
+        if(crest>0.94 && p.profundidad>0.6){
+            ctx.fillStyle="rgba(255,255,255,0.9)";
             ctx.beginPath();
-            ctx.arc(p.x, y - p.size*2, p.size*1.2, 0, Math.PI*2);
+            ctx.arc(p.x,y-p.size*2,p.size*1.2,0,Math.PI*2);
             ctx.fill();
         }
     }
@@ -294,7 +326,7 @@ function drawOcean(){
 }
 
 /* ==========================================
-   LOOP GENERAL
+   LOOP
 ========================================== */
 
 function animar(){
@@ -313,5 +345,7 @@ function animar(){
         drawCielo();
         drawOcean();
     }
+
+    drawFade();
 }
 
