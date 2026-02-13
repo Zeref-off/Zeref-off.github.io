@@ -1,221 +1,273 @@
 /* ==========================================
-   FATUM AMANTIS – CINE EXTREMO
-   Océano cinematográfico profesional
+   FATUM AMANTIS – VERSION CINE EXTREMO
+   Flujo completo restaurado
 ========================================== */
 
 const screenInicio = document.getElementById("screenInicio");
 const screenScene = document.getElementById("screenScene");
 
+const matrixCanvas = document.getElementById("matrixCanvas");
+const mtx = matrixCanvas.getContext("2d");
+
 const canvas = document.getElementById("sceneCanvas");
 const ctx = canvas.getContext("2d");
 
+const poemaLeft = document.getElementById("poemaLeft");
+const poemaRight = document.getElementById("poemaRight");
+const contadorEl = document.getElementById("contador");
+const timeEl = document.getElementById("time");
+
+/* ==========================================
+   SIZE
+========================================== */
+
 let W, H;
 function resize(){
-    W = canvas.width = window.innerWidth;
-    H = canvas.height = window.innerHeight;
+    W = window.innerWidth;
+    H = window.innerHeight;
+
+    canvas.width = W;
+    canvas.height = H;
+
+    matrixCanvas.width = W;
+    matrixCanvas.height = H;
 }
 window.addEventListener("resize", resize);
 resize();
 
 /* ==========================================
-   CONTROL DE ESCENA
+   MATRIX INICIO
 ========================================== */
 
-function iniciar(){
-    screenInicio.classList.remove("active");
-    screenScene.classList.add("active");
+let matrixCols;
+let matrixDrops;
 
-    crearOceano();
-    animar();
+function initMatrix(){
+    matrixCols = Math.floor(W / 20);
+    matrixDrops = Array(matrixCols).fill(1);
 }
 
-window.iniciar = iniciar;
+function drawMatrix(){
+    mtx.fillStyle = "rgba(0,0,0,0.05)";
+    mtx.fillRect(0,0,W,H);
+
+    mtx.fillStyle = "#ff0040";
+    mtx.font = "16px monospace";
+
+    for(let i=0;i<matrixDrops.length;i++){
+        let text = Math.random() > 0.5 ? "0" : "1";
+        mtx.fillText(text, i*20, matrixDrops[i]*20);
+
+        if(matrixDrops[i]*20 > H && Math.random()>0.975){
+            matrixDrops[i]=0;
+        }
+        matrixDrops[i]++;
+    }
+}
 
 /* ==========================================
-   CONTADOR → MODO FINAL
+   NIEVE
 ========================================== */
 
-let duracion = 60000; // ajusta si deseas
-let inicioTiempo = Date.now();
-let modoFinal = false;
+let snow = [];
 
-/* ==========================================
-   CONFIGURACION OCEANO
-========================================== */
+function initSnow(){
+    snow = [];
+    for(let i=0;i<150;i++){
+        snow.push({
+            x: Math.random()*W,
+            y: Math.random()*H,
+            r: Math.random()*2+1,
+            s: Math.random()*1+0.5
+        });
+    }
+}
 
-let particulas = [];
-let tiempo = 0;
+function drawSnow(){
+    ctx.fillStyle = "white";
+    for(let p of snow){
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+        ctx.fill();
 
-// cámara flotante (sensación barco)
-let camX = 0;
-let camY = 0;
-
-function crearOceano(){
-
-    particulas = [];
-
-    const capas = 6;
-
-    for(let c = 0; c < capas; c++){
-
-        let profundidad = c / capas;
-        let cantidad = 180 + c * 100;
-
-        for(let i=0; i<cantidad; i++){
-
-            particulas.push({
-                x: Math.random() * W,
-                baseY: H * (0.45 + profundidad * 0.55),
-
-                profundidad: profundidad,
-
-                amp: 30 + profundidad * 120,
-                freq: 0.0015 + Math.random()*0.002,
-                speed: 0.4 + profundidad * 1.8,
-                size: 1 + profundidad * 3,
-
-                fase: Math.random() * Math.PI * 2
-            });
+        p.y += p.s;
+        if(p.y>H){
+            p.y=0;
+            p.x=Math.random()*W;
         }
     }
 }
 
 /* ==========================================
-   FUNCION DE OLAS (MULTIONDA)
+   POEMAS
 ========================================== */
 
-function ola(p, t){
+const poema1 = `
+Eres el instante
+donde el tiempo respira,
+la calma entre mis latidos.
+`;
 
-    let w1 = Math.sin(p.x * p.freq + t * p.speed + p.fase);
-    let w2 = Math.sin(p.x * p.freq * 0.5 + t * p.speed * 0.7);
-    let w3 = Math.sin(p.x * p.freq * 2 + t * p.speed * 1.2);
+const poema2 = `
+Y si el mundo termina,
+que sea contigo,
+mirando el mar infinito.
+`;
 
-    return p.baseY + (w1 + w2*0.6 + w3*0.3) * p.amp;
+function mostrarPoema(el, texto, velocidad, callback){
+    el.style.opacity = 1;
+    let i=0;
+    el.innerHTML="";
+    let interval = setInterval(()=>{
+        el.innerHTML += texto[i];
+        i++;
+        if(i>=texto.length){
+            clearInterval(interval);
+            setTimeout(()=>{
+                el.style.opacity = 0;
+                if(callback) callback();
+            },1500);
+        }
+    }, velocidad);
 }
 
 /* ==========================================
-   FONDO NOCTURNO + LUNA
+   CONTADOR
 ========================================== */
 
-function drawCielo(){
+let tiempoRestante = 15000;
+let contadorActivo = false;
 
-    let grad = ctx.createLinearGradient(0,0,0,H);
-    grad.addColorStop(0,"#000814");
-    grad.addColorStop(0.5,"#001d3d");
-    grad.addColorStop(1,"#00111f");
+function iniciarContador(){
+    contadorActivo = true;
+}
 
-    ctx.fillStyle = grad;
-    ctx.fillRect(0,0,W,H);
+function actualizarContador(){
+    if(!contadorActivo) return;
 
-    // Luna
-    let moonX = W * 0.8;
-    let moonY = H * 0.15;
-    let radius = 40;
+    tiempoRestante -= 40;
+    if(tiempoRestante < 0) tiempoRestante = 0;
 
-    let glow = ctx.createRadialGradient(moonX, moonY, 0, moonX, moonY, 120);
-    glow.addColorStop(0,"rgba(255,255,220,0.8)");
-    glow.addColorStop(1,"rgba(255,255,220,0)");
+    let s = Math.floor(tiempoRestante/1000);
+    let m = Math.floor(s/60);
+    let h = Math.floor(m/60);
+    let d = Math.floor(h/24);
 
-    ctx.fillStyle = glow;
-    ctx.beginPath();
-    ctx.arc(moonX, moonY, 120, 0, Math.PI*2);
-    ctx.fill();
+    timeEl.innerText = `${d}d ${h%24}h ${m%60}m ${s%60}s`;
 
-    ctx.fillStyle = "#fff8cc";
-    ctx.beginPath();
-    ctx.arc(moonX, moonY, radius, 0, Math.PI*2);
-    ctx.fill();
+    if(tiempoRestante === 0){
+        modoFinal = true;
+        poemaLeft.style.display="none";
+        poemaRight.style.display="none";
+        contadorEl.style.display="none";
+    }
 }
 
 /* ==========================================
    OCEANO CINEMATOGRAFICO
 ========================================== */
 
+let particulas=[];
+let tiempo=0;
+let modoFinal=false;
+
+function crearOceano(){
+    particulas=[];
+    for(let i=0;i<900;i++){
+        particulas.push({
+            x:Math.random()*W,
+            baseY:H*0.5 + Math.random()*H*0.5,
+            amp:20+Math.random()*120,
+            freq:0.002+Math.random()*0.003,
+            speed:0.5+Math.random()*1.5,
+            size:1+Math.random()*3,
+            fase:Math.random()*Math.PI*2
+        });
+    }
+}
+
+function drawCielo(){
+    let g=ctx.createLinearGradient(0,0,0,H);
+    g.addColorStop(0,"#000814");
+    g.addColorStop(1,"#001d3d");
+    ctx.fillStyle=g;
+    ctx.fillRect(0,0,W,H);
+
+    // luna
+    ctx.fillStyle="#fff8cc";
+    ctx.beginPath();
+    ctx.arc(W*0.8,H*0.15,40,0,Math.PI*2);
+    ctx.fill();
+}
+
 function drawOcean(){
-
-    // movimiento de cámara (flotando)
-    camX = Math.sin(tiempo * 0.2) * 20;
-    camY = Math.sin(tiempo * 0.15) * 10;
-
-    ctx.save();
-    ctx.translate(camX, camY);
-
     for(let p of particulas){
+        let y = p.baseY + Math.sin(p.x*p.freq + tiempo*p.speed + p.fase)*p.amp;
 
-        let y = ola(p, tiempo);
+        p.x += 0.2;
+        if(p.x>W) p.x=0;
 
-        // corriente horizontal
-        p.x += p.profundidad * 0.4;
-        if(p.x > W) p.x = 0;
-
-        // color oceánico profundo
-        let blue = 100 + p.profundidad * 120;
-        let alpha = 0.25 + p.profundidad * 0.6;
-
-        ctx.fillStyle = `rgba(0, ${blue}, 255, ${alpha})`;
+        ctx.fillStyle=`rgba(0,120,255,0.4)`;
         ctx.beginPath();
-        ctx.arc(p.x, y, p.size, 0, Math.PI*2);
+        ctx.arc(p.x,y,p.size,0,Math.PI*2);
         ctx.fill();
 
-        // ESPUMA en crestas
-        let crest = Math.sin(p.x * p.freq + tiempo * p.speed + p.fase);
-
-        if(crest > 0.93 && p.profundidad > 0.6){
-            ctx.fillStyle = `rgba(255,255,255,${(crest-0.9)*6})`;
+        // espuma
+        let crest = Math.sin(p.x*p.freq + tiempo*p.speed + p.fase);
+        if(crest>0.9){
+            ctx.fillStyle="rgba(255,255,255,0.8)";
             ctx.beginPath();
-            ctx.arc(p.x, y - p.size*2, p.size*1.2, 0, Math.PI*2);
-            ctx.fill();
-        }
-
-        // reflejo lunar
-        let moonReflectionZone = W * 0.7;
-        if(p.x > moonReflectionZone && p.profundidad > 0.5){
-            ctx.fillStyle = "rgba(255,255,200,0.05)";
-            ctx.beginPath();
-            ctx.arc(p.x, y, p.size*1.5, 0, Math.PI*2);
+            ctx.arc(p.x,y-p.size*2,p.size,0,Math.PI*2);
             ctx.fill();
         }
     }
-
-    ctx.restore();
 }
 
 /* ==========================================
-   NIEBLA ATMOSFERICA
+   CONTROL INICIO
 ========================================== */
 
-function drawFog(){
-    let fog = ctx.createLinearGradient(0, H*0.5, 0, H);
-    fog.addColorStop(0,"rgba(0,0,0,0)");
-    fog.addColorStop(1,"rgba(0,0,0,0.6)");
+function iniciar(){
+    screenInicio.classList.remove("active");
+    screenScene.classList.add("active");
 
-    ctx.fillStyle = fog;
-    ctx.fillRect(0,0,W,H);
+    initSnow();
+    crearOceano();
+
+    mostrarPoema(poemaLeft, poema1, 20, ()=>{
+        mostrarPoema(poemaRight, poema2, 20, ()=>{
+            iniciarContador();
+        });
+    });
 }
 
+window.iniciar = iniciar;
+
 /* ==========================================
-   LOOP PRINCIPAL
+   LOOP
 ========================================== */
 
-function animar(){
+function loop(){
+    requestAnimationFrame(loop);
 
-    requestAnimationFrame(animar);
-
-    tiempo += 0.01;
-
-    // verificar final
-    if(!modoFinal && Date.now() - inicioTiempo > duracion){
-        modoFinal = true;
-
-        document.getElementById("poemaLeft").style.display = "none";
-        document.getElementById("poemaRight").style.display = "none";
-        document.getElementById("contador").style.display = "none";
+    if(screenInicio.classList.contains("active")){
+        drawMatrix();
+        return;
     }
 
-    drawCielo();
-    drawOcean();
-    drawFog();
+    ctx.clearRect(0,0,W,H);
+
+    if(!modoFinal){
+        drawSnow();
+        actualizarContador();
+    }else{
+        drawCielo();
+        drawOcean();
+        tiempo += 0.02;
+    }
 }
 
+initMatrix();
+loop();
 
 
