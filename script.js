@@ -255,105 +255,98 @@ function drawOcean(){
         }
     }
 
-    function draw(){
+function drawOcean(){
 
-        tiempo += 0.03;
+    const canvas = document.getElementById("sceneCanvas");
+    const ctx = canvas.getContext("2d");
 
-        /* ===== FONDO PROFUNDO (GRADIENTE OCEANO) ===== */
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 
-        let grad = ctx.createLinearGradient(0, profundidad, 0, H);
-        grad.addColorStop(0, "#0a2a4a"); // azul profundo
-        grad.addColorStop(0.5, "#0f4c75");
-        grad.addColorStop(1, "#1ca3c7"); // turquesa orilla
+    const W = canvas.width;
+    const H = canvas.height;
 
-        ctx.fillStyle = grad;
-        ctx.fillRect(0, 0, W, H);
+    /* =========================
+       SISTEMA DE PARTÍCULAS OCEANO
+    ========================= */
 
-        /* ===== OLA PRINCIPAL (forma de playa) ===== */
+    let particles = [];
+    let tiempo = 0;
 
-        ctx.beginPath();
+    const capas = 3;            // profundidad (3 niveles)
+    const densidad = 1800;      // cantidad total
 
-        for(let x=0; x<=W; x+=2){
+    for(let c=0; c<capas; c++){
 
-            // múltiples ondas combinadas = realismo
-            let y =
-                profundidad +
-                Math.sin(x*0.01 + tiempo)*20 +
-                Math.sin(x*0.02 + tiempo*1.5)*10 +
-                Math.sin(x*0.005 + tiempo*0.5)*15;
+        for(let i=0; i<densidad/capas; i++){
 
-            // crecimiento al acercarse a la orilla
-            let factor = (x / W);
-            y += factor * 80;
-
-            // zona de rompiente
-            if(y > orilla){
-                crearEspuma(x, orilla);
-                y = orilla;
-            }
-
-            if(x===0) ctx.moveTo(x,y);
-            else ctx.lineTo(x,y);
+            particles.push({
+                x: Math.random()*W,
+                y: Math.random()*H,
+                capa: c,
+                size: 1 + c,
+                speed: 0.2 + c*0.2
+            });
         }
-
-        ctx.lineTo(W,H);
-        ctx.lineTo(0,H);
-        ctx.closePath();
-
-        ctx.fillStyle = "rgba(0,120,180,0.8)";
-        ctx.fill();
-
-        /* ===== CAPA SUPERIOR DE OLA (cresta) ===== */
-
-        ctx.beginPath();
-
-        for(let x=0; x<=W; x+=4){
-
-            let y =
-                profundidad +
-                Math.sin(x*0.01 + tiempo)*18 +
-                Math.sin(x*0.02 + tiempo*1.5)*8 +
-                Math.sin(x*0.005 + tiempo*0.5)*12;
-
-            let factor = (x / W);
-            y += factor * 70;
-
-            if(y > orilla){
-                y = orilla;
-            }
-
-            if(x===0) ctx.moveTo(x,y);
-            else ctx.lineTo(x,y);
-        }
-
-        ctx.strokeStyle = "rgba(255,255,255,0.25)";
-        ctx.lineWidth = 2;
-        ctx.stroke();
-
-        /* ===== ESPUMA (PARTICULAS BLANCAS) ===== */
-
-        for(let i=espuma.length-1;i>=0;i--){
-            let p = espuma[i];
-
-            p.x += p.vx;
-            p.y += p.vy;
-            p.vy += 0.03;
-            p.vida--;
-
-            ctx.fillStyle = "rgba(255,255,255,"+(p.vida/60)+")";
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, 2, 0, Math.PI*2);
-            ctx.fill();
-
-            if(p.vida <= 0){
-                espuma.splice(i,1);
-            }
-        }
-
-        requestAnimationFrame(draw);
     }
 
-    draw();
+    /* =========================
+       ANIMACIÓN
+    ========================= */
+
+    function animar(){
+
+        tiempo += 0.02;
+
+        ctx.clearRect(0,0,W,H);
+
+        particles.forEach(p=>{
+
+            /* ===== PROFUNDIDAD ===== */
+            let profundidadFactor = (p.capa+1)/capas;
+
+            /* ===== OLA PRINCIPAL (swell del océano abierto) ===== */
+            let wave1 = Math.sin((p.x*0.003) + tiempo*0.8) * 30 * profundidadFactor;
+            let wave2 = Math.sin((p.x*0.008) + tiempo*1.6) * 15 * profundidadFactor;
+            let wave3 = Math.sin((p.x*0.015) + tiempo*2.5) * 6 * profundidadFactor;
+
+            /* altura base según capa */
+            let baseY = H*0.4 + p.capa*40;
+
+            let yWave = baseY + wave1 + wave2 + wave3;
+
+            /* movimiento vertical suave */
+            p.y += (yWave - p.y) * 0.05;
+
+            /* deriva horizontal (corriente) */
+            p.x += Math.sin(tiempo*0.3 + p.capa) * 0.3;
+
+            if(p.x > W) p.x = 0;
+            if(p.x < 0) p.x = W;
+
+            /* ===== CRESTA (rompimiento de ola) ===== */
+            let crest = wave1 + wave2;
+
+            let brillo = 0.4 + profundidadFactor*0.6;
+            let color;
+
+            if(crest > 25){  
+                // espuma blanca en rompimiento
+                color = "rgba(200,230,255,0.9)";
+            }else{
+                // tonos azul profundo según profundidad
+                let blue = 150 + p.capa*40;
+                color = `rgba(0, ${blue}, 255, ${brillo})`;
+            }
+
+            ctx.fillStyle = color;
+            ctx.fillRect(p.x, p.y, p.size, p.size);
+        });
+
+        requestAnimationFrame(animar);
+    }
+
+    animar();
 }
 
 
@@ -372,6 +365,7 @@ drawOcean();
 
 requestAnimationFrame(animar);
 }
+
 
 
 
