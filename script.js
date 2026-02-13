@@ -1,11 +1,10 @@
-/* =====================================================
-   FATUM AMANTIS – VERSION CINE PROFESIONAL
-   Océano cinematográfico por partículas
-===================================================== */
+/* ==========================================
+   FATUM AMANTIS – CINE EXTREMO
+   Océano cinematográfico profesional
+========================================== */
 
 const screenInicio = document.getElementById("screenInicio");
 const screenScene = document.getElementById("screenScene");
-const startBox = document.getElementById("startBox");
 
 const canvas = document.getElementById("sceneCanvas");
 const ctx = canvas.getContext("2d");
@@ -18,9 +17,9 @@ function resize(){
 window.addEventListener("resize", resize);
 resize();
 
-/* ===============================
-   CONTROL DE ESCENAS
-=============================== */
+/* ==========================================
+   CONTROL DE ESCENA
+========================================== */
 
 function iniciar(){
     screenInicio.classList.remove("active");
@@ -30,45 +29,49 @@ function iniciar(){
     animar();
 }
 
-/* ===============================
-   CONFIGURACION DE TIEMPO FINAL
-   (cuando llegue a cero = solo océano)
-=============================== */
+window.iniciar = iniciar;
 
-let duracion = 60000; // 1 minuto (ajusta si deseas)
+/* ==========================================
+   CONTADOR → MODO FINAL
+========================================== */
+
+let duracion = 60000; // ajusta si deseas
 let inicioTiempo = Date.now();
 let modoFinal = false;
 
-/* ===============================
-   OCEANO CINEMATOGRAFICO
-=============================== */
+/* ==========================================
+   CONFIGURACION OCEANO
+========================================== */
 
 let particulas = [];
 let tiempo = 0;
+
+// cámara flotante (sensación barco)
+let camX = 0;
+let camY = 0;
 
 function crearOceano(){
 
     particulas = [];
 
-    const capas = 5;            // profundidad
-    const densidadBase = 160;   // cantidad de partículas
+    const capas = 6;
 
     for(let c = 0; c < capas; c++){
 
         let profundidad = c / capas;
-        let cantidad = densidadBase + c * 80;
+        let cantidad = 180 + c * 100;
 
         for(let i=0; i<cantidad; i++){
 
             particulas.push({
                 x: Math.random() * W,
-                yBase: H * (0.45 + profundidad * 0.5),
-                y: 0,
+                baseY: H * (0.45 + profundidad * 0.55),
+
                 profundidad: profundidad,
 
-                amp: 20 + profundidad * 80,       // altura de ola
-                freq: 0.002 + Math.random()*0.002,
-                speed: 0.5 + profundidad * 1.5,
+                amp: 30 + profundidad * 120,
+                freq: 0.0015 + Math.random()*0.002,
+                speed: 0.4 + profundidad * 1.8,
                 size: 1 + profundidad * 3,
 
                 fase: Math.random() * Math.PI * 2
@@ -77,73 +80,122 @@ function crearOceano(){
     }
 }
 
-/* ===============================
-   FUNCION DE OLA PROFESIONAL
-   combina varias ondas para realismo
-=============================== */
+/* ==========================================
+   FUNCION DE OLAS (MULTIONDA)
+========================================== */
 
-function calcularOla(p, t){
+function ola(p, t){
 
-    let ola1 = Math.sin((p.x * p.freq) + t * p.speed + p.fase);
-    let ola2 = Math.sin((p.x * p.freq * 0.5) + t * p.speed * 0.7);
-    let ola3 = Math.sin((p.x * p.freq * 2) + t * p.speed * 1.3);
+    let w1 = Math.sin(p.x * p.freq + t * p.speed + p.fase);
+    let w2 = Math.sin(p.x * p.freq * 0.5 + t * p.speed * 0.7);
+    let w3 = Math.sin(p.x * p.freq * 2 + t * p.speed * 1.2);
 
-    let mezcla = (ola1 + ola2*0.6 + ola3*0.3);
-
-    return p.yBase + mezcla * p.amp;
+    return p.baseY + (w1 + w2*0.6 + w3*0.3) * p.amp;
 }
 
-/* ===============================
-   DIBUJAR OCEANO
-=============================== */
+/* ==========================================
+   FONDO NOCTURNO + LUNA
+========================================== */
 
-function drawOcean(){
+function drawCielo(){
 
-    // Fondo profundo (degradado)
-    let grad = ctx.createLinearGradient(0, H*0.3, 0, H);
-    grad.addColorStop(0, "#041a2b");
-    grad.addColorStop(0.5, "#062c45");
-    grad.addColorStop(1, "#020d16");
+    let grad = ctx.createLinearGradient(0,0,0,H);
+    grad.addColorStop(0,"#000814");
+    grad.addColorStop(0.5,"#001d3d");
+    grad.addColorStop(1,"#00111f");
 
     ctx.fillStyle = grad;
     ctx.fillRect(0,0,W,H);
 
-    // Dibujar partículas por profundidad
+    // Luna
+    let moonX = W * 0.8;
+    let moonY = H * 0.15;
+    let radius = 40;
+
+    let glow = ctx.createRadialGradient(moonX, moonY, 0, moonX, moonY, 120);
+    glow.addColorStop(0,"rgba(255,255,220,0.8)");
+    glow.addColorStop(1,"rgba(255,255,220,0)");
+
+    ctx.fillStyle = glow;
+    ctx.beginPath();
+    ctx.arc(moonX, moonY, 120, 0, Math.PI*2);
+    ctx.fill();
+
+    ctx.fillStyle = "#fff8cc";
+    ctx.beginPath();
+    ctx.arc(moonX, moonY, radius, 0, Math.PI*2);
+    ctx.fill();
+}
+
+/* ==========================================
+   OCEANO CINEMATOGRAFICO
+========================================== */
+
+function drawOcean(){
+
+    // movimiento de cámara (flotando)
+    camX = Math.sin(tiempo * 0.2) * 20;
+    camY = Math.sin(tiempo * 0.15) * 10;
+
+    ctx.save();
+    ctx.translate(camX, camY);
+
     for(let p of particulas){
 
-        p.y = calcularOla(p, tiempo);
+        let y = ola(p, tiempo);
 
-        // Movimiento horizontal lento (corriente)
-        p.x += p.profundidad * 0.3;
+        // corriente horizontal
+        p.x += p.profundidad * 0.4;
         if(p.x > W) p.x = 0;
 
-        // Color según profundidad
-        let azul = 120 + p.profundidad * 100;
-        let alpha = 0.3 + p.profundidad * 0.6;
+        // color oceánico profundo
+        let blue = 100 + p.profundidad * 120;
+        let alpha = 0.25 + p.profundidad * 0.6;
 
-        ctx.fillStyle = `rgba(0, ${azul}, 255, ${alpha})`;
+        ctx.fillStyle = `rgba(0, ${blue}, 255, ${alpha})`;
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+        ctx.arc(p.x, y, p.size, 0, Math.PI*2);
         ctx.fill();
 
-        // =============================
-        // ESPUMA EN CRESTAS (cine)
-        // =============================
-        let cresta = Math.sin((p.x * p.freq) + tiempo * p.speed + p.fase);
+        // ESPUMA en crestas
+        let crest = Math.sin(p.x * p.freq + tiempo * p.speed + p.fase);
 
-        if(cresta > 0.92 && p.profundidad > 0.6){
-
-            ctx.fillStyle = `rgba(255,255,255,${(cresta-0.9)*5})`;
+        if(crest > 0.93 && p.profundidad > 0.6){
+            ctx.fillStyle = `rgba(255,255,255,${(crest-0.9)*6})`;
             ctx.beginPath();
-            ctx.arc(p.x, p.y - p.size*2, p.size*0.9, 0, Math.PI*2);
+            ctx.arc(p.x, y - p.size*2, p.size*1.2, 0, Math.PI*2);
+            ctx.fill();
+        }
+
+        // reflejo lunar
+        let moonReflectionZone = W * 0.7;
+        if(p.x > moonReflectionZone && p.profundidad > 0.5){
+            ctx.fillStyle = "rgba(255,255,200,0.05)";
+            ctx.beginPath();
+            ctx.arc(p.x, y, p.size*1.5, 0, Math.PI*2);
             ctx.fill();
         }
     }
+
+    ctx.restore();
 }
 
-/* ===============================
-   ANIMACION
-=============================== */
+/* ==========================================
+   NIEBLA ATMOSFERICA
+========================================== */
+
+function drawFog(){
+    let fog = ctx.createLinearGradient(0, H*0.5, 0, H);
+    fog.addColorStop(0,"rgba(0,0,0,0)");
+    fog.addColorStop(1,"rgba(0,0,0,0.6)");
+
+    ctx.fillStyle = fog;
+    ctx.fillRect(0,0,W,H);
+}
+
+/* ==========================================
+   LOOP PRINCIPAL
+========================================== */
 
 function animar(){
 
@@ -151,27 +203,19 @@ function animar(){
 
     tiempo += 0.01;
 
-    // Verificar contador
+    // verificar final
     if(!modoFinal && Date.now() - inicioTiempo > duracion){
         modoFinal = true;
 
-        // Ocultar textos y todo lo demás
         document.getElementById("poemaLeft").style.display = "none";
         document.getElementById("poemaRight").style.display = "none";
         document.getElementById("contador").style.display = "none";
     }
 
+    drawCielo();
     drawOcean();
+    drawFog();
 }
-
-/* ===============================
-   BOTON
-=============================== */
-
-window.iniciar = iniciar;
-
-
-
 
 
 
