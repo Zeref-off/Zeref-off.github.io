@@ -206,8 +206,8 @@ function iniciar(){
     initSnow();
     crearOceano();
 
-    escribirPoema(poemaLeft, texto1, 16, ()=>{
-        escribirPoema(poemaRight, texto2, 16, ()=>{
+    escribirPoema(poemaLeft, texto1, 40, ()=>{
+        escribirPoema(poemaRight, texto2, 40, ()=>{
             iniciarContador();
         });
     });
@@ -383,6 +383,7 @@ function animar(){
 
     drawFade();
 }
+
 
 
 
