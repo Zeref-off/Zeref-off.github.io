@@ -22,6 +22,7 @@ const contadorEl = document.getElementById("contador");
 ========================================== */
 
 let W, H;
+
 function resize(){
     W = window.innerWidth;
     H = window.innerHeight;
@@ -30,6 +31,7 @@ function resize(){
     matrixCanvas.width = W;
     matrixCanvas.height = H;
 }
+
 window.addEventListener("resize", resize);
 resize();
 
@@ -52,13 +54,11 @@ let indiceOceano = 0;
 const audioOceano = new Audio(playlistOceano[indiceOceano]);
 
 /* ==========================================
-   SUBTÍTULOS POR CANCIÓN (EDITA AQUÍ)
-   Canción 5 = sin subtítulos
+   SUBTÍTULOS POR CANCIÓN
+   (Canción 5 sin subtítulos)
 ========================================== */
 
 const subtitulosCanciones = [
-
-    // Canción 1
     [
        "Quiero se tu canción desde el principio al fin,",
        "quiero rozarme en tus labios y ser tu carmín",
@@ -107,8 +107,6 @@ const subtitulosCanciones = [
        "Convierte su amor en su vida,",
        "su comida y bebida en la justa medida..."
     ],
-
-    // Canción 2
     [
         "¿Cuándo dejaras de romper mi corazón?",
         "No quiero ser otro más",
@@ -205,56 +203,40 @@ const subtitulosCanciones = [
         "Solo besame esta vez",
         "Mi unico sueño es sobre tu y yo"
     ],
-
-    // Canción 3
     [
         "Texto línea 1 canción 3...",
         "Texto línea 2 canción 3...",
-        "Texto línea 1 canción 2...",
-        "Texto línea 2 canción 2...",
-        "Texto línea 1 canción 2...",
-        "Texto línea 2 canción 2...",
-        "Texto línea 1 canción 2...",
-        "Texto línea 1 canción 2...",
-        "Texto línea 2 canción 2...",
-        "Texto línea 1 canción 2...",
-        "Texto línea 2 canción 2...",
-        "Texto línea 1 canción 2..."
+        "Texto línea 3 canción 3..."
     ],
-
-    // Canción 4
     [
         "Texto línea 1 canción 4...",
         "Texto línea 2 canción 4...",
-        "Texto línea 1 canción 2...",
-        "Texto línea 2 canción 2...",
-        "Texto línea 1 canción 2...",
-        "Texto línea 2 canción 2...",
-        "Texto línea 1 canción 2...",
-        "Texto línea 1 canción 2...",
-        "Texto línea 2 canción 2...",
-        "Texto línea 1 canción 2...",
-        "Texto línea 2 canción 2...",
-        "Texto línea 1 canción 2..."
+        "Texto línea 3 canción 4..."
     ]
-
     // Canción 5 → sin subtítulos
 ];
 
 let indiceLinea = 0;
-let intervaloEscritura;
-let intervaloBorrado;
+let intervaloEscritura = null;
+let intervaloBorrado = null;
 
-/* Mostrar una línea */
+/* Mostrar línea con efecto escribir + borrar */
 function mostrarLinea(texto, callback){
+
+    if(!texto || texto.trim() === ""){
+        setTimeout(callback, 400);
+        return;
+    }
 
     subtitulos.style.opacity = 1;
     subtitulos.innerHTML = "";
 
     let i = 0;
 
-    intervaloEscritura = setInterval(()=>{
+    clearInterval(intervaloEscritura);
+    clearInterval(intervaloBorrado);
 
+    intervaloEscritura = setInterval(()=>{
         subtitulos.innerHTML += texto[i];
         i++;
 
@@ -266,7 +248,6 @@ function mostrarLinea(texto, callback){
                 let contenido = subtitulos.innerHTML;
 
                 intervaloBorrado = setInterval(()=>{
-
                     contenido = contenido.slice(0, -1);
                     subtitulos.innerHTML = contenido;
 
@@ -275,22 +256,22 @@ function mostrarLinea(texto, callback){
                         if(callback) callback();
                     }
 
-                }, 15);
+                }, 18);
 
-            }, 1800);
+            }, 1600);
         }
 
-    }, 35);
+    }, 32);
 }
 
-/* Iniciar subtítulos de una canción */
+/* Iniciar subtítulos por canción */
 function iniciarSubtitulosCancion(indiceCancion){
 
     clearInterval(intervaloEscritura);
     clearInterval(intervaloBorrado);
 
-    // Canción 5 → sin subtítulos
     if(indiceCancion >= subtitulosCanciones.length){
+        subtitulos.innerHTML = "";
         subtitulos.style.opacity = 0;
         return;
     }
@@ -300,9 +281,7 @@ function iniciarSubtitulosCancion(indiceCancion){
 
     function siguienteLinea(){
 
-        // Si cambió de canción, detener
         if(indiceOceano !== indiceCancion) return;
-
         if(indiceLinea >= lineas.length) return;
 
         mostrarLinea(lineas[indiceLinea], ()=>{
@@ -318,7 +297,10 @@ function iniciarSubtitulosCancion(indiceCancion){
 audioOceano.addEventListener("ended", () => {
 
     indiceOceano++;
-    if(indiceOceano >= playlistOceano.length) indiceOceano = 0;
+
+    if(indiceOceano >= playlistOceano.length){
+        indiceOceano = 0;
+    }
 
     audioOceano.src = playlistOceano[indiceOceano];
     audioOceano.play().catch(()=>{});
@@ -342,10 +324,11 @@ let estado = "inicio";
 
 const matrixText = "Fatum Amantis";
 const fontSize = 22;
-let cols = Math.floor(W / fontSize);
+let cols = Math.floor(window.innerWidth / fontSize);
 let drops = Array(cols).fill(0);
 
 function drawMatrix(){
+
     if(estado !== "inicio") return;
 
     mtx.fillStyle = "rgba(0,0,0,0.08)";
@@ -355,15 +338,18 @@ function drawMatrix(){
     mtx.font = fontSize + "px monospace";
 
     for(let i=0;i<drops.length;i++){
+
         let char = matrixText[Math.floor(Math.random()*matrixText.length)];
         mtx.fillText(char, i*fontSize, drops[i]*fontSize);
 
         if(drops[i]*fontSize > H && Math.random()>0.96){
-            drops[i]=0;
+            drops[i] = 0;
         }
+
         drops[i]++;
     }
 }
+
 setInterval(drawMatrix, 60);
 
 /* ==========================================
@@ -423,9 +409,10 @@ y te transforma, desde el primer dia supe
 que habia algo distinto en ti, algo que te
 hacia brillar mas que a las demas, algo
 que me atrapo y me hizo sentir que eras
-tu lo que siempre habia estado esperando`;
+tu lo que siempre habia estado esperando.`;
 
 function escribirPoema(el, texto, velocidad, callback){
+
     el.style.opacity = 1;
     el.innerHTML = "";
     let i = 0;
@@ -496,30 +483,30 @@ function pasarAFinal(){
 }
 
 /* ==========================================
-   OCEANO (SIN CAMBIOS)
+   OCEANO
 ========================================== */
 
 let particulas = [];
 let tiempo = 0;
-let camX = 0;
-let camY = 0;
 
 function crearOceano(){
+
     particulas = [];
     const capas = 7;
 
     for(let c = 0; c < capas; c++){
+
         let profundidad = c / capas;
-        let cantidad = 500 + c * 250;
+        let cantidad = 400 + c * 200;
 
         for(let i=0;i<cantidad;i++){
             particulas.push({
                 x: Math.random()*W,
                 baseY: H*(0.45 + profundidad*0.55),
                 profundidad: profundidad,
-                amp: 40 + profundidad*140,
-                freq: 0.0015 + Math.random()*0.002,
-                speed: 0.4 + profundidad*2,
+                amp: 40 + profundidad*120,
+                freq: 0.002 + Math.random()*0.002,
+                speed: 0.5 + profundidad*2,
                 size: 1 + profundidad*3,
                 fase: Math.random()*Math.PI*2
             });
@@ -527,38 +514,24 @@ function crearOceano(){
     }
 }
 
-function ola(p, t){
-    let w1 = Math.sin(p.x*p.freq + t*p.speed + p.fase);
-    let w2 = Math.sin(p.x*p.freq*0.5 + t*p.speed*0.7);
-    let w3 = Math.sin(p.x*p.freq*2 + t*p.speed*1.2);
-    return p.baseY + (w1 + w2*0.6 + w3*0.3)*p.amp;
-}
-
 function drawOcean(){
-
-    camX = Math.sin(tiempo*0.15)*18;
-    camY = Math.sin(tiempo*0.12)*8;
-
-    ctx.save();
-    ctx.translate(camX, camY);
 
     for(let p of particulas){
 
-        let y = ola(p, tiempo);
+        let y = p.baseY +
+            Math.sin(p.x*p.freq + tiempo*p.speed + p.fase)*p.amp;
 
-        p.x += p.profundidad*0.4;
+        p.x += p.profundidad*0.5;
         if(p.x > W) p.x = 0;
 
-        let blue = 100 + p.profundidad*130;
-        let alpha = 0.25 + p.profundidad*0.7;
+        let blue = 120 + p.profundidad*120;
+        let alpha = 0.3 + p.profundidad*0.6;
 
         ctx.fillStyle = `rgba(0,${blue},255,${alpha})`;
         ctx.beginPath();
         ctx.arc(p.x,y,p.size,0,Math.PI*2);
         ctx.fill();
     }
-
-    ctx.restore();
 }
 
 /* ==========================================
@@ -566,6 +539,7 @@ function drawOcean(){
 ========================================== */
 
 function animar(){
+
     requestAnimationFrame(animar);
     tiempo += 0.01;
 
@@ -579,7 +553,5 @@ function animar(){
         drawOcean();
     }
 }
-
-
 
 
