@@ -61,150 +61,15 @@ const audioOceano = new Audio(playlistOceano[indiceOceano]);
 const subtitulosCanciones = [
     // Canción 1
     [
-        "Quiero se tu canción desde el principio al fin,",
-        "quiero rozarme en tus labios y ser tu carmín",
-        "Ser el jabón que te suaviza, el baño que te baña,",
-        "la toalla que deslizas por tu piel mojada",
-        "Yo quiero ser tu almohada, tu edredón de seda,",
-        "besarte mientras sueñas y verte dormir",
-        "Yo quiero ser el sol que entra y da sobre tu cama,",
-        "despertarte poco a poco, hacerte sonreír",
-        "Quiero estar en el más suave toque de tus dedos,",
-        "entrar en lo más intimo de tus secretos",
-        "Quiero ser la cosa buena,",
-        "liberada o prohibida, ser todo en tu vida",
-        "Todo lo que me quieras dar,",
-        "quiero que me lo des",
-        "Yo te doy todo lo que un hombre",
-        "entrega a una mujer",
-        "Y más allá de ese cariño que siempre me das, me"
-        "imagino tantas cosas, quiero siempre más",
-        "Tu eres mi dulce desayuno, mi pastel perfecto,",
-        "mi bebida preferida, el plato predilecto",
-        "Yo como y bebo de lo bueno y no tengo hora fija,",
-        "de mañana, tarde o noche, no hago dieta",
-        "Y ese amor que alimenta a mi fantasía,",
-        "es mi sueño, es mi fiesta, es mi alegría",
-        "La comida más sabrosa, mi perfume,",
-        "mi bebida, es todo en mi vida",
-        "Todo hombre que sabe querer,",
-        "sabe dar y pedir a la mujer",
-        "Lo mejor y hacer de ese amor",
-        "lo que come, que bebe, que da, que recíbe",
-        "El hombre que sabe querer,",
-        "y se apasiona por una mujer",
-        "Convierte su amor en su vida,",
-        "su comida y bebida en la justa medida",
-        "El hombre que sabe querer,",
-        "sabe dar y pedir a la mujer",
-        "Lo mejor y hacer de ese amor",
-        "lo qu come, que bebe, que da, que recibe",
-        "Pero el hombre que sabe querer",
-        "y se apasiona por una mujer",
-        "Convierte su amor en su vida,",
-        "su comida y bebida en la justa medida",
-        "Pero el hombre que sabe querer",
-        "y se apasiona por una mujer",
-        "Convierte su amor en su vida,",
-        "su comida y bebida en la justa medida..."
+        "Subtítulo canción 1 - línea 1",
+        "Subtítulo canción 1 - línea 2",
+        "Subtítulo canción 1 - línea 3"
     ],
 
     // Canción 2
     [
-        "¿Cuándo dejaras de romper mi corazón?",
-        "No quiero ser otro más",
-        "Pagando por las cosas que nunca hice",
-        "No dejes ir",
-        "No dejes ir a mi amor",
-        "",
-        "",
-        "",
-        "",
-        "¿Puedo llegar a tu alma?",
-        "¿Puedes llegar a mis pensamientos?",
-        "¿Podemos prometer que no lo dejaremos ir?",
-        "Todas las cosas que necesito",
-        "Todas las cosas que tu necesitas",
-        "Puedes hacer que se sienta tan real",
-        "Porque no puedes negar",
-        "Has explotado mi mente",
-        "Cuando toco tu cuerpo",
-        "Siento que estoy perdiendo el control",
-        "Porque no puedes negar",
-        "Has explotado mi mente",
-        "Cuando te veo cariño",
-        "Simplemente no quiero dejarlo ir",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "Odio verte llorar",
-        "Tu sonrisa es una hermosa mentira",
-        "",
-        "",
-        "",
-        "Odio verte llorar",
-        "Mi amor esta muriendo por dentro",
-        "Yo puedo arreglar todas esas mentiras",
-        "Oh cariño, cariño, corro",
-        "Pero estoy corriendo hacia ti",
-        "No me verás llorar",
-        "Me estoy escondiendo por dentro",
-        "Mi corazón duele, pero estoy conriendo para ti",
-        "¿Puedo llegar a tu alma?",
-        "¿Puedes llegar a mis pensamientos?",
-        "¿Podemos prometer que no lo dejaremos ir?",
-        "Todas las cosas que necesito",
-        "Todas las cosas que tu necesitas",
-        "Puedes hacer que se sienta tan real",
-        "Porque no puedes negar",
-        "Has explotado mi mente",
-        "Cuando toco tu cuerpo",
-        "Siento que estoy perdiendo el control",
-        "Porque no puedes negar",
-        "Has explotado mi mente",
-        "Cuando te veo cariño",
-        "Simplemente no quiero dejarlo ir",
-        "",
-        "",
-        "",
-        "¿Cuándo dejaras de romper mi corazón?",
-        "No dejes ir",
-        "No dejes ir a mi amor",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "Odio verte llorar",
-        "Tu sonrisa es una hermosa mentira",
-        "Odio verte llorar",
-        "Mi amor esta muriendo por dentro",
-        "Odio verte llorar",
-        "Mi amor esta muriendo por dentro",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "Odio verte llorar",
-        "Tu sonrisa es una hermosa mentira",
-        "Yo puedo arreglar todas esas mentiras",
-        "Tu sonrisa es una hermosa mentira",
-        "Oh cariño, cariño, corro",
-        "Pero estoy corriendo hacia ti",
-        "No me verás llorar",
-        "Me estoy escondiendo por dentro",
-        "Mi corazon duele, pero estoy sonriendo para ti",
-        "Oh cariño intentare hacer las cosas bien",
-        "te necesito mas que el aire cuando no estoy contigo",
-        "Por favor no me preguntes por que",
-        "Solo besame esta vez",
-        "Mi unico sueño es sobre tu y yo"
+        "Subtítulo canción 2 - línea 1",
+        "Subtítulo canción 2 - línea 2"
     ],
 
     // Canción 3
@@ -259,10 +124,10 @@ function escribirLineaSubtitulo(texto, callback){
                     }
                 }, 18);
 
-            }, 1800);
+            }, 3000);
         }
 
-    }, 30);
+    }, 60);
 }
 
 function iniciarSubtitulosCancion(indice){
@@ -603,6 +468,7 @@ function animar(){
         drawOcean();
     }
 }
+
 
 
 
