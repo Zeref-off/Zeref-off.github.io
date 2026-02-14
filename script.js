@@ -34,16 +34,12 @@ window.addEventListener("resize", resize);
 resize();
 
 /* ==========================================
-   AUDIO SECUENCIAL
+   AUDIO
 ========================================== */
 
-// Escena 1
 const audioInicio = new Audio("inicio.mp3");
-
-// Escena 2
 const audioPoemas = new Audio("poemas.mp3");
 
-// Escena 3 (playlist)
 const playlistOceano = [
     "oceano1.mp3",
     "oceano2.mp3",
@@ -52,81 +48,178 @@ const playlistOceano = [
     "oceano5.mp3"
 ];
 
-// Subtítulos por canción (puedes editarlos)
-const subtitulosOceano = [
-`Letra de la canción 1...
-Texto de ejemplo para el océano.
-Letra de la canción 1...
-Texto de ejemplo para el océano.
-Letra de la canción 1...
-Texto de ejemplo para el océano.
-Letra de la canción 1...
-Texto de ejemplo para el océano.
-Letra de la canción 1...
-Texto de ejemplo para el océano.
-Letra de la canción 1...
-Texto de ejemplo para el océano.`,
-
-`Letra de la canción 2...
-Aquí puedes colocar la letra real.
-Letra de la canción 1...
-Texto de ejemplo para el océano.
-Letra de la canción 1...
-Texto de ejemplo para el océano.
-Letra de la canción 1...
-Texto de ejemplo para el océano.
-Letra de la canción 1...
-Texto de ejemplo para el océano.`,
-
-`Letra de la canción 3...
-Mensaje emocional o romántico.
-Letra de la canción 1...
-Texto de ejemplo para el océano.
-Letra de la canción 1...
-Texto de ejemplo para el océano.
-Letra de la canción 1...
-Texto de ejemplo para el océano.
-Letra de la canción 1...
-Texto de ejemplo para el océano.`,
-
-`Letra de la canción 4...
-Texto que acompañe la atmósfera.
-Letra de la canción 1...
-Texto de ejemplo para el océano.
-Letra de la canción 1...
-Texto de ejemplo para el océano.
-Letra de la canción 1...
-Texto de ejemplo para el océano.
-Letra de la canción 1...
-Texto de ejemplo para el océano.`,
-
-`Letra de la canción 5...
-Final del viaje en el océano.
-Letra de la canción 1...
-Texto de ejemplo para el océano.
-Letra de la canción 1...
-Texto de ejemplo para el océano.
-Letra de la canción 1...
-Texto de ejemplo para el océano.
-Letra de la canción 1...
-Texto de ejemplo para el océano.`
-];
-
 let indiceOceano = 0;
 const audioOceano = new Audio(playlistOceano[indiceOceano]);
 
-// Cambio automático de canciones + subtítulos
+/* ==========================================
+   SUBTÍTULOS POR CANCIÓN (EDITA AQUÍ)
+   Canción 5 = sin subtítulos
+========================================== */
+
+const subtitulosCanciones = [
+
+    // Canción 1
+    [
+       "Texto línea 1 canción 1...",
+       "Texto línea 2 canción 1...",
+       "Texto línea 3 canción 1...",
+       "Texto línea 1 canción 1...",
+       "Texto línea 2 canción 1...",
+       "Texto línea 1 canción 1...",
+       "Texto línea 2 canción 1...",
+       "Texto línea 1 canción 1...",
+       "Texto línea 2 canción 1...",
+       "Texto línea 1 canción 1...",
+       "Texto línea 2 canción 1...",
+       "Texto línea 1 canción 1...",
+       "Texto línea 2 canción 1...",
+       "Texto línea 1 canción 1...",
+       "Texto línea 2 canción 1...",
+       "Texto línea 1 canción 1...",
+       "Texto línea 2 canción 1..."
+    ],
+
+    // Canción 2
+    [
+        "Texto línea 1 canción 2...",
+        "Texto línea 2 canción 2...",
+        "Texto línea 2 canción 2...",
+        "Texto línea 1 canción 2...",
+        "Texto línea 2 canción 2...",
+        "Texto línea 1 canción 2...",
+        "Texto línea 2 canción 2...",
+        "Texto línea 1 canción 2...",
+        "Texto línea 2 canción 2...",
+        "Texto línea 1 canción 2...",
+        "Texto línea 2 canción 2...",
+        "Texto línea 1 canción 2...",
+        "Texto línea 2 canción 2...",
+        "Texto línea 1 canción 2...",
+        "Texto línea 2 canción 2..."
+       
+    ],
+
+    // Canción 3
+    [
+        "Texto línea 1 canción 3...",
+        "Texto línea 2 canción 3...",
+        "Texto línea 1 canción 2...",
+        "Texto línea 2 canción 2...",
+        "Texto línea 1 canción 2...",
+        "Texto línea 2 canción 2...",
+        "Texto línea 1 canción 2...",
+        "Texto línea 1 canción 2...",
+        "Texto línea 2 canción 2...",
+        "Texto línea 1 canción 2...",
+        "Texto línea 2 canción 2...",
+        "Texto línea 1 canción 2..."
+    ],
+
+    // Canción 4
+    [
+        "Texto línea 1 canción 4...",
+        "Texto línea 2 canción 4...",
+        "Texto línea 1 canción 2...",
+        "Texto línea 2 canción 2...",
+        "Texto línea 1 canción 2...",
+        "Texto línea 2 canción 2...",
+        "Texto línea 1 canción 2...",
+        "Texto línea 1 canción 2...",
+        "Texto línea 2 canción 2...",
+        "Texto línea 1 canción 2...",
+        "Texto línea 2 canción 2...",
+        "Texto línea 1 canción 2..."
+    ]
+
+    // Canción 5 → sin subtítulos
+];
+
+let indiceLinea = 0;
+let intervaloEscritura;
+let intervaloBorrado;
+
+/* Mostrar una línea */
+function mostrarLinea(texto, callback){
+
+    subtitulos.style.opacity = 1;
+    subtitulos.innerHTML = "";
+
+    let i = 0;
+
+    intervaloEscritura = setInterval(()=>{
+
+        subtitulos.innerHTML += texto[i];
+        i++;
+
+        if(i >= texto.length){
+            clearInterval(intervaloEscritura);
+
+            setTimeout(()=>{
+
+                let contenido = subtitulos.innerHTML;
+
+                intervaloBorrado = setInterval(()=>{
+
+                    contenido = contenido.slice(0, -1);
+                    subtitulos.innerHTML = contenido;
+
+                    if(contenido.length === 0){
+                        clearInterval(intervaloBorrado);
+                        if(callback) callback();
+                    }
+
+                }, 15);
+
+            }, 1800);
+        }
+
+    }, 35);
+}
+
+/* Iniciar subtítulos de una canción */
+function iniciarSubtitulosCancion(indiceCancion){
+
+    clearInterval(intervaloEscritura);
+    clearInterval(intervaloBorrado);
+
+    // Canción 5 → sin subtítulos
+    if(indiceCancion >= subtitulosCanciones.length){
+        subtitulos.style.opacity = 0;
+        return;
+    }
+
+    const lineas = subtitulosCanciones[indiceCancion];
+    indiceLinea = 0;
+
+    function siguienteLinea(){
+
+        // Si cambió de canción, detener
+        if(indiceOceano !== indiceCancion) return;
+
+        if(indiceLinea >= lineas.length) return;
+
+        mostrarLinea(lineas[indiceLinea], ()=>{
+            indiceLinea++;
+            siguienteLinea();
+        });
+    }
+
+    siguienteLinea();
+}
+
+/* Cambio automático de canciones */
 audioOceano.addEventListener("ended", () => {
+
     indiceOceano++;
     if(indiceOceano >= playlistOceano.length) indiceOceano = 0;
 
     audioOceano.src = playlistOceano[indiceOceano];
     audioOceano.play().catch(()=>{});
 
-    escribirSubtitulos(subtitulosOceano[indiceOceano]);
+    iniciarSubtitulosCancion(indiceOceano);
 });
 
-// Transiciones automáticas
+/* Transiciones automáticas */
 audioInicio.addEventListener("ended", pasarAPoemas);
 audioPoemas.addEventListener("ended", pasarAFinal);
 
@@ -203,7 +296,7 @@ function drawSnow(){
    POEMAS
 ========================================== */
 
-const texto1 = `AMO ELEGIRTE       
+const texto1 = `AMO ELEGIRTE
 Tantas almas magicas en este mundo,
 pero es la tuya la unica que quiero,
 es tu sonrisa la que acelera mis
@@ -223,7 +316,7 @@ y te transforma, desde el primer dia supe
 que habia algo distinto en ti, algo que te
 hacia brillar mas que a las demas, algo
 que me atrapo y me hizo sentir que eras
-tu lo que siempre habia estado esperando.`;
+tu lo que siempre habia estado esperando`;
 
 function escribirPoema(el, texto, velocidad, callback){
     el.style.opacity = 1;
@@ -242,73 +335,11 @@ function escribirPoema(el, texto, velocidad, callback){
 }
 
 /* ==========================================
-   SUBTÍTULOS – EFECTO PROGRESIVO
-========================================== */
-
-/* ==========================================
-   SUBTÍTULOS – APARECER Y DESAPARECER
-========================================== */
-
-let intervaloSubtitulos;
-let intervaloBorrado;
-
-function escribirSubtitulos(texto, velocidadEscritura = 35, tiempoVisible = 2000, velocidadBorrado = 20){
-
-    clearInterval(intervaloSubtitulos);
-    clearInterval(intervaloBorrado);
-
-    subtitulos.style.opacity = 1;
-    subtitulos.innerHTML = "";
-
-    let i = 0;
-
-    // ESCRIBIR
-    intervaloSubtitulos = setInterval(()=>{
-
-        subtitulos.innerHTML += texto[i];
-        i++;
-
-        if(i >= texto.length){
-            clearInterval(intervaloSubtitulos);
-
-            // Mantener visible un momento
-            setTimeout(()=>{
-
-                let contenido = subtitulos.innerHTML;
-
-                // BORRAR letra por letra
-                intervaloBorrado = setInterval(()=>{
-
-                    contenido = contenido.slice(0, -1);
-                    subtitulos.innerHTML = contenido;
-
-                    if(contenido.length === 0){
-                        clearInterval(intervaloBorrado);
-
-                        // Repetir ciclo mientras la canción sigue
-                        if(estado === "final"){
-                            escribirSubtitulos(texto, velocidadEscritura, tiempoVisible, velocidadBorrado);
-                        }
-
-                    }
-
-                }, velocidadBorrado);
-
-            }, tiempoVisible);
-        }
-
-    }, velocidadEscritura);
-}
-
-/* ==========================================
    INICIAR
 ========================================== */
 
 function iniciar(){
-
     startBox.style.display = "none";
-
-    audioInicio.currentTime = 0;
     audioInicio.volume = 0.6;
     audioInicio.play().catch(()=>{});
 }
@@ -325,7 +356,6 @@ function pasarAPoemas(){
     screenInicio.classList.remove("active");
     screenScene.classList.add("active");
 
-    audioPoemas.currentTime = 0;
     audioPoemas.volume = 0.6;
     audioPoemas.play().catch(()=>{});
 
@@ -355,11 +385,11 @@ function pasarAFinal(){
     audioOceano.play().catch(()=>{});
 
     subtitulos.style.display = "block";
-    escribirSubtitulos(subtitulosOceano[0]);
+    iniciarSubtitulosCancion(indiceOceano);
 }
 
 /* ==========================================
-   OCEANO CINEMATOGRÁFICO ORIGINAL
+   OCEANO (SIN CAMBIOS)
 ========================================== */
 
 let particulas = [];
@@ -395,15 +425,6 @@ function ola(p, t){
     let w2 = Math.sin(p.x*p.freq*0.5 + t*p.speed*0.7);
     let w3 = Math.sin(p.x*p.freq*2 + t*p.speed*1.2);
     return p.baseY + (w1 + w2*0.6 + w3*0.3)*p.amp;
-}
-
-function drawCielo(){
-    let grad = ctx.createLinearGradient(0,0,0,H);
-    grad.addColorStop(0,"rgba(0,8,20,0.6)");
-    grad.addColorStop(1,"rgba(0,17,31,0.8)");
-
-    ctx.fillStyle = grad;
-    ctx.fillRect(0,0,W,H);
 }
 
 function drawOcean(){
@@ -448,11 +469,9 @@ function animar(){
     }
 
     if(estado === "final"){
-        drawCielo();
         drawOcean();
     }
 }
-
 
 
 
