@@ -1,5 +1,7 @@
+document.addEventListener("DOMContentLoaded", () => {
+
 /* ==========================================
-   FATUM AMANTIS – CINE PREMIUM SECUENCIAL
+   ELEMENTOS (SEGUROS)
 ========================================== */
 
 const subtitulos = document.getElementById("subtitulos");
@@ -8,28 +10,35 @@ const screenScene = document.getElementById("screenScene");
 const startBox = document.getElementById("startBox");
 
 const matrixCanvas = document.getElementById("matrixCanvas");
-const mtx = matrixCanvas.getContext("2d");
-
 const canvas = document.getElementById("sceneCanvas");
-const ctx = canvas.getContext("2d");
 
 const poemaLeft = document.getElementById("poemaLeft");
 const poemaRight = document.getElementById("poemaRight");
 const contadorEl = document.getElementById("contador");
 
+const mtx = matrixCanvas ? matrixCanvas.getContext("2d") : null;
+const ctx = canvas ? canvas.getContext("2d") : null;
+
 /* ==========================================
    SIZE
 ========================================== */
 
-let W, H;
+let W = window.innerWidth;
+let H = window.innerHeight;
 
 function resize(){
     W = window.innerWidth;
     H = window.innerHeight;
-    canvas.width = W;
-    canvas.height = H;
-    matrixCanvas.width = W;
-    matrixCanvas.height = H;
+
+    if(canvas){
+        canvas.width = W;
+        canvas.height = H;
+    }
+
+    if(matrixCanvas){
+        matrixCanvas.width = W;
+        matrixCanvas.height = H;
+    }
 }
 
 window.addEventListener("resize", resize);
@@ -51,185 +60,44 @@ const playlistOceano = [
 ];
 
 let indiceOceano = 0;
-const audioOceano = new Audio(playlistOceano[indiceOceano]);
+const audioOceano = new Audio(playlistOceano[0]);
 
 /* ==========================================
-   SUBTÍTULOS POR CANCIÓN
-   (Canción 5 sin subtítulos)
+   SUBTÍTULOS
 ========================================== */
 
 const subtitulosCanciones = [
     [
-       "Quiero se tu canción desde el principio al fin,",
-       "quiero rozarme en tus labios y ser tu carmín",
-       "Ser el jabón que te suaviza, el baño que te baña,",
-       "la toalla que deslizas por tu piel mojada",
-       "Yo quiero ser tu almohada, tu edredón de seda,",
-       "besarte mientras sueñas y verte dormir",
-       "Yo quiero ser el sol que entra y da sobre tu cama,",
-       "despertarte poco a poco, hacerte sonreír",
-       "Quiero estar en el más suave toque de tus dedos,",
-       "entrar en lo más intimo de tus secretos",
-       "Quiero ser la cosa buena,",
-       "liberada o prohibida, ser todo en tu vida",
-       "Todo lo que me quieras dar,",
-       "quiero que me lo des",
-       "Yo te doy todo lo que un hombre",
-       "entrega a una mujer",
-       "Y más allá de ese cariño que siempre me das, me"
-       "imagino tantas cosas, quiero siempre más",
-       "Tu eres mi dulce desayuno, mi pastel perfecto,",
-       "mi bebida preferida, el plato predilecto",
-       "Yo como y bebo de lo bueno y no tengo hora fija,",
-       "de mañana, tarde o noche, no hago dieta",
-       "Y ese amor que alimenta a mi fantasía,",
-       "es mi sueño, es mi fiesta, es mi alegría",
-       "La comida más sabrosa, mi perfume,",
-       "mi bebida, es todo en mi vida",
-       "Todo hombre que sabe querer,",
-       "sabe dar y pedir a la mujer",
-       "Lo mejor y hacer de ese amor",
-       "lo que come, que bebe, que da, que recíbe",
-       "El hombre que sabe querer,",
-       "y se apasiona por una mujer",
-       "Convierte su amor en su vida,",
-       "su comida y bebida en la justa medida",
-       "El hombre que sabe querer,",
-       "sabe dar y pedir a la mujer",
-       "Lo mejor y hacer de ese amor",
-       "lo qu come, que bebe, que da, que recibe",
-       "Pero el hombre que sabe querer",
-       "y se apasiona por una mujer",
-       "Convierte su amor en su vida,",
-       "su comida y bebida en la justa medida",
-       "Pero el hombre que sabe querer",
-       "y se apasiona por una mujer",
-       "Convierte su amor en su vida,",
-       "su comida y bebida en la justa medida..."
+        "Quiero ser tu canción desde el principio al fin",
+        "Quiero rozarme en tus labios y ser tu carmín",
+        "Ser la luz que acompaña tu despertar",
+        "Y el silencio donde puedas descansar"
     ],
     [
-        "¿Cuándo dejaras de romper mi corazón?",
-        "No quiero ser otro más",
-        "Pagando por las cosas que nunca hice",
-        "No dejes ir",
-        "No dejes ir a mi amor",
-        "",
-        "",
-        "",
-        "",
         "¿Puedo llegar a tu alma?",
-        "¿Puedes llegar a mis pensamientos?",
-        "¿Podemos prometer que no lo dejaremos ir?",
-        "Todas las cosas que necesito",
-        "Todas las cosas que tu necesitas",
-        "Puedes hacer que se sienta tan real",
-        "Porque no puedes negar",
-        "Has explotado mi mente",
-        "Cuando toco tu cuerpo",
-        "Siento que estoy perdiendo el control",
-        "Porque no puedes negar",
-        "Has explotado mi mente",
-        "Cuando te veo cariño",
-        "Simplemente no quiero dejarlo ir",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "Odio verte llorar",
-        "Tu sonrisa es una hermosa mentira",
-        "",
-        "",
-        "",
-        "Odio verte llorar",
-        "Mi amor esta muriendo por dentro",
-        "Yo puedo arreglar todas esas mentiras",
-        "Oh cariño, cariño, corro",
-        "Pero estoy corriendo hacia ti",
-        "No me verás llorar",
-        "Me estoy escondiendo por dentro",
-        "Mi corazón duele, pero estoy conriendo para ti",
-        "¿Puedo llegar a tu alma?",
-        "¿Puedes llegar a mis pensamientos?",
-        "¿Podemos prometer que no lo dejaremos ir?",
-        "Todas las cosas que necesito",
-        "Todas las cosas que tu necesitas",
-        "Puedes hacer que se sienta tan real",
-        "Porque no puedes negar",
-        "Has explotado mi mente",
-        "Cuando toco tu cuerpo",
-        "Siento que estoy perdiendo el control",
-        "Porque no puedes negar",
-        "Has explotado mi mente",
-        "Cuando te veo cariño",
-        "Simplemente no quiero dejarlo ir",
-        "",
-        "",
-        "",
-        "¿Cuándo dejaras de romper mi corazón?",
-        "No dejes ir",
-        "No dejes ir a mi amor",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "Odio verte llorar",
-        "Tu sonrisa es una hermosa mentira",
-        "Odio verte llorar",
-        "Mi amor esta muriendo por dentro",
-        "Odio verte llorar",
-        "Mi amor esta muriendo por dentro",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "Odio verte llorar",
-        "Tu sonrisa es una hermosa mentira",
-        "Yo puedo arreglar todas esas mentiras",
-        "Tu sonrisa es una hermosa mentira",
-        "Oh cariño, cariño, corro",
-        "Pero estoy corriendo hacia ti",
-        "No me verás llorar",
-        "Me estoy escondiendo por dentro",
-        "Mi corazon duele, pero estoy sonriendo para ti",
-        "Oh cariño intentare hacer las cosas bien",
-        "te necesito mas que el aire cuando no estoy contigo",
-        "Por favor no me preguntes por que",
-        "Solo besame esta vez",
-        "Mi unico sueño es sobre tu y yo"
+        "No quiero dejarte ir",
+        "Mi único sueño es tú y yo"
     ],
     [
-        "Texto línea 1 canción 3...",
-        "Texto línea 2 canción 3...",
-        "Texto línea 3 canción 3..."
+        "Texto canción 3...",
+        "Más texto canción 3..."
     ],
     [
-        "Texto línea 1 canción 4...",
-        "Texto línea 2 canción 4...",
-        "Texto línea 3 canción 4..."
+        "Texto canción 4...",
+        "Más texto canción 4..."
     ]
-    // Canción 5 → sin subtítulos
 ];
 
+let intervaloEscritura;
+let intervaloBorrado;
 let indiceLinea = 0;
-let intervaloEscritura = null;
-let intervaloBorrado = null;
 
-/* Mostrar línea con efecto escribir + borrar */
 function mostrarLinea(texto, callback){
 
-    if(!texto || texto.trim() === ""){
-        setTimeout(callback, 400);
-        return;
-    }
+    if(!subtitulos) return;
 
-    subtitulos.style.opacity = 1;
     subtitulos.innerHTML = "";
+    subtitulos.style.opacity = 1;
 
     let i = 0;
 
@@ -248,69 +116,60 @@ function mostrarLinea(texto, callback){
                 let contenido = subtitulos.innerHTML;
 
                 intervaloBorrado = setInterval(()=>{
-                    contenido = contenido.slice(0, -1);
+                    contenido = contenido.slice(0,-1);
                     subtitulos.innerHTML = contenido;
 
                     if(contenido.length === 0){
                         clearInterval(intervaloBorrado);
                         if(callback) callback();
                     }
+                }, 15);
 
-                }, 18);
-
-            }, 1600);
+            }, 1500);
         }
 
-    }, 32);
+    }, 30);
 }
 
-/* Iniciar subtítulos por canción */
-function iniciarSubtitulosCancion(indiceCancion){
+function iniciarSubtitulosCancion(indice){
+
+    if(!subtitulos) return;
 
     clearInterval(intervaloEscritura);
     clearInterval(intervaloBorrado);
 
-    if(indiceCancion >= subtitulosCanciones.length){
-        subtitulos.innerHTML = "";
+    if(indice >= subtitulosCanciones.length){
         subtitulos.style.opacity = 0;
         return;
     }
 
-    const lineas = subtitulosCanciones[indiceCancion];
+    const lineas = subtitulosCanciones[indice];
     indiceLinea = 0;
 
-    function siguienteLinea(){
+    function siguiente(){
 
-        if(indiceOceano !== indiceCancion) return;
+        if(indiceOceano !== indice) return;
         if(indiceLinea >= lineas.length) return;
 
         mostrarLinea(lineas[indiceLinea], ()=>{
             indiceLinea++;
-            siguienteLinea();
+            siguiente();
         });
     }
 
-    siguienteLinea();
+    siguiente();
 }
 
-/* Cambio automático de canciones */
 audioOceano.addEventListener("ended", () => {
 
     indiceOceano++;
-
-    if(indiceOceano >= playlistOceano.length){
-        indiceOceano = 0;
-    }
+    if(indiceOceano >= playlistOceano.length) indiceOceano = 0;
 
     audioOceano.src = playlistOceano[indiceOceano];
     audioOceano.play().catch(()=>{});
 
     iniciarSubtitulosCancion(indiceOceano);
 });
-
-/* Transiciones automáticas */
-audioInicio.addEventListener("ended", pasarAPoemas);
-audioPoemas.addEventListener("ended", pasarAFinal);
 
 /* ==========================================
    ESTADOS
@@ -319,48 +178,35 @@ audioPoemas.addEventListener("ended", pasarAFinal);
 let estado = "inicio";
 
 /* ==========================================
-   MATRIX
+   MATRIX (SEGURO)
 ========================================== */
-
-const matrixText = "Fatum Amantis";
-const fontSize = 22;
-let cols = Math.floor(window.innerWidth / fontSize);
-let drops = Array(cols).fill(0);
 
 function drawMatrix(){
 
-    if(estado !== "inicio") return;
+    if(!mtx || estado !== "inicio") return;
 
     mtx.fillStyle = "rgba(0,0,0,0.08)";
     mtx.fillRect(0,0,W,H);
 
     mtx.fillStyle = "#ff4d6d";
-    mtx.font = fontSize + "px monospace";
+    mtx.font = "20px monospace";
 
-    for(let i=0;i<drops.length;i++){
-
-        let char = matrixText[Math.floor(Math.random()*matrixText.length)];
-        mtx.fillText(char, i*fontSize, drops[i]*fontSize);
-
-        if(drops[i]*fontSize > H && Math.random()>0.96){
-            drops[i] = 0;
-        }
-
-        drops[i]++;
+    for(let i=0;i<50;i++){
+        mtx.fillText("F", Math.random()*W, Math.random()*H);
     }
 }
 
 setInterval(drawMatrix, 60);
 
 /* ==========================================
-   NIEVE
+   NIEVE / OCEANO
 ========================================== */
 
 let snow = [];
 
 function initSnow(){
     snow = [];
-    for(let i=0;i<240;i++){
+    for(let i=0;i<200;i++){
         snow.push({
             x: Math.random()*W,
             y: Math.random()*H,
@@ -371,6 +217,8 @@ function initSnow(){
 }
 
 function drawSnow(){
+    if(!ctx) return;
+
     ctx.fillStyle="white";
     for(let s of snow){
         ctx.beginPath();
@@ -389,77 +237,45 @@ function drawSnow(){
    POEMAS
 ========================================== */
 
-const texto1 = `AMO ELEGIRTE
-Tantas almas magicas en este mundo,
-pero es la tuya la unica que quiero,
-es tu sonrisa la que acelera mis
-latidos y es tu mano la que siempre
-deseo sujetar.
-Es a tu lado donde siento que todo
-tiene sentido y se tambien que eres
-tu mi mas bonita decision.`;
+function escribirPoema(el, texto, velocidad){
+    if(!el) return;
 
-const texto2 = `Me enamore de ti desde 
-aquel instante en que llegaste a mi vida 
-sin previo aviso cuando ni siquiera 
-imaginaba que alguien tan especial como 
-tu apareceria y es que contigo aprendi 
-que el amor no se busca simplemente llega
-y te transforma, desde el primer dia supe 
-que habia algo distinto en ti, algo que te
-hacia brillar mas que a las demas, algo
-que me atrapo y me hizo sentir que eras
-tu lo que siempre habia estado esperando.`;
-
-function escribirPoema(el, texto, velocidad, callback){
-
-    el.style.opacity = 1;
     el.innerHTML = "";
     let i = 0;
 
     let inter = setInterval(()=>{
         el.innerHTML += texto[i];
         i++;
-
-        if(i >= texto.length){
-            clearInterval(inter);
-            if(callback) callback();
-        }
+        if(i >= texto.length) clearInterval(inter);
     }, velocidad);
 }
-
-/* ==========================================
-   INICIAR
-========================================== */
-
-function iniciar(){
-    startBox.style.display = "none";
-    audioInicio.volume = 0.6;
-    audioInicio.play().catch(()=>{});
-}
-window.iniciar = iniciar;
 
 /* ==========================================
    TRANSICIONES
 ========================================== */
 
+function iniciar(){
+
+    if(startBox) startBox.style.display = "none";
+
+    audioInicio.volume = 0.6;
+    audioInicio.play().catch(()=>{});
+}
+window.iniciar = iniciar;
+
+audioInicio.addEventListener("ended", pasarAPoemas);
+audioPoemas.addEventListener("ended", pasarAFinal);
+
 function pasarAPoemas(){
 
     estado = "poemas";
 
-    screenInicio.classList.remove("active");
-    screenScene.classList.add("active");
+    if(screenInicio) screenInicio.classList.remove("active");
+    if(screenScene) screenScene.classList.add("active");
 
-    audioPoemas.volume = 0.6;
     audioPoemas.play().catch(()=>{});
 
     initSnow();
-    crearOceano();
-
-    escribirPoema(poemaLeft, texto1, 60, ()=>{
-        escribirPoema(poemaRight, texto2, 60);
-    });
-
     animar();
 }
 
@@ -467,70 +283,17 @@ function pasarAFinal(){
 
     estado = "final";
 
-    poemaLeft.style.display = "none";
-    poemaRight.style.display = "none";
-    contadorEl.style.display = "none";
-
-    screenScene.classList.add("final");
+    if(poemaLeft) poemaLeft.style.display = "none";
+    if(poemaRight) poemaRight.style.display = "none";
+    if(contadorEl) contadorEl.style.display = "none";
 
     indiceOceano = 0;
-    audioOceano.src = playlistOceano[indiceOceano];
-    audioOceano.volume = 0.6;
+    audioOceano.src = playlistOceano[0];
     audioOceano.play().catch(()=>{});
 
-    subtitulos.style.display = "block";
-    iniciarSubtitulosCancion(indiceOceano);
-}
-
-/* ==========================================
-   OCEANO
-========================================== */
-
-let particulas = [];
-let tiempo = 0;
-
-function crearOceano(){
-
-    particulas = [];
-    const capas = 7;
-
-    for(let c = 0; c < capas; c++){
-
-        let profundidad = c / capas;
-        let cantidad = 400 + c * 200;
-
-        for(let i=0;i<cantidad;i++){
-            particulas.push({
-                x: Math.random()*W,
-                baseY: H*(0.45 + profundidad*0.55),
-                profundidad: profundidad,
-                amp: 40 + profundidad*120,
-                freq: 0.002 + Math.random()*0.002,
-                speed: 0.5 + profundidad*2,
-                size: 1 + profundidad*3,
-                fase: Math.random()*Math.PI*2
-            });
-        }
-    }
-}
-
-function drawOcean(){
-
-    for(let p of particulas){
-
-        let y = p.baseY +
-            Math.sin(p.x*p.freq + tiempo*p.speed + p.fase)*p.amp;
-
-        p.x += p.profundidad*0.5;
-        if(p.x > W) p.x = 0;
-
-        let blue = 120 + p.profundidad*120;
-        let alpha = 0.3 + p.profundidad*0.6;
-
-        ctx.fillStyle = `rgba(0,${blue},255,${alpha})`;
-        ctx.beginPath();
-        ctx.arc(p.x,y,p.size,0,Math.PI*2);
-        ctx.fill();
+    if(subtitulos){
+        subtitulos.style.display = "block";
+        iniciarSubtitulosCancion(0);
     }
 }
 
@@ -541,17 +304,15 @@ function drawOcean(){
 function animar(){
 
     requestAnimationFrame(animar);
-    tiempo += 0.01;
+
+    if(!ctx) return;
 
     ctx.clearRect(0,0,W,H);
 
     if(estado === "poemas"){
         drawSnow();
     }
-
-    if(estado === "final"){
-        drawOcean();
-    }
 }
 
+});
 
