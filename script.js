@@ -54,13 +54,121 @@ const playlistOceano = [
 let indiceOceano = 0;
 const audioOceano = new Audio(playlistOceano[indiceOceano]);
 
+/* ==========================================
+   SUBTÍTULOS OCEANO (SECUENCIALES)
+========================================== */
+
+const subtitulosCanciones = [
+    // Canción 1
+    [
+        "Subtítulo canción 1 - línea 1",
+        "Subtítulo canción 1 - línea 2",
+        "Subtítulo canción 1 - línea 3"
+    ],
+
+    // Canción 2
+    [
+        "Subtítulo canción 2 - línea 1",
+        "Subtítulo canción 2 - línea 2"
+    ],
+
+    // Canción 3
+    [
+        "Subtítulo canción 3 - línea 1",
+        "Subtítulo canción 3 - línea 2"
+    ],
+
+    // Canción 4
+    [
+        "Subtítulo canción 4 - línea 1",
+        "Subtítulo canción 4 - línea 2"
+    ]
+
+    // Canción 5 → sin subtítulos
+];
+
+let intervaloEscritura;
+let intervaloBorrado;
+let indiceLinea = 0;
+
+function escribirLineaSubtitulo(texto, callback){
+
+    clearInterval(intervaloEscritura);
+    clearInterval(intervaloBorrado);
+
+    subtitulos.innerHTML = "";
+    subtitulos.style.opacity = 1;
+
+    let i = 0;
+
+    // Escribir
+    intervaloEscritura = setInterval(()=>{
+        subtitulos.innerHTML += texto[i];
+        i++;
+
+        if(i >= texto.length){
+            clearInterval(intervaloEscritura);
+
+            // Pausa antes de borrar
+            setTimeout(()=>{
+
+                let contenido = subtitulos.innerHTML;
+
+                intervaloBorrado = setInterval(()=>{
+                    contenido = contenido.slice(0,-1);
+                    subtitulos.innerHTML = contenido;
+
+                    if(contenido.length === 0){
+                        clearInterval(intervaloBorrado);
+                        if(callback) callback();
+                    }
+                }, 18);
+
+            }, 1800);
+        }
+
+    }, 30);
+}
+
+function iniciarSubtitulosCancion(indice){
+
+    // Canción 5 o fuera de rango → ocultar
+    if(indice >= subtitulosCanciones.length){
+        subtitulos.style.opacity = 0;
+        return;
+    }
+
+    const lineas = subtitulosCanciones[indice];
+    indiceLinea = 0;
+
+    function siguiente(){
+
+        // Seguridad: si cambió de canción, detener
+        if(indiceOceano !== indice) return;
+
+        if(indiceLinea >= lineas.length) return;
+
+        escribirLineaSubtitulo(lineas[indiceLinea], ()=>{
+            indiceLinea++;
+            siguiente();
+        });
+    }
+
+    siguiente();
+}
+
+
 // Playlist en bucle
 audioOceano.addEventListener("ended", () => {
     indiceOceano++;
     if(indiceOceano >= playlistOceano.length) indiceOceano = 0;
+
     audioOceano.src = playlistOceano[indiceOceano];
     audioOceano.play();
+
+    iniciarSubtitulosCancion(indiceOceano);
 });
+
 
 // Transiciones automáticas
 audioInicio.addEventListener("ended", pasarAPoemas);
@@ -233,8 +341,8 @@ function pasarAFinal(){
     audioOceano.volume = 0.6;
     audioOceano.play().catch(()=>{});
 
-    subtitulos.style.opacity = 1;
-    subtitulos.innerText = "Aquí aparecerá la letra de la canción, Aquí aparecerá la letra de la canciónAquí aparecerá la letra de la canciónAquí aparecerá la letra de la canciónAquí aparecerá la letra de la canción";
+    subtitulos.style.display = "block";
+iniciarSubtitulosCancion(indiceOceano);
 }
 
 /* ==========================================
@@ -360,4 +468,5 @@ function animar(){
         drawOcean();
     }
 }
+
 
