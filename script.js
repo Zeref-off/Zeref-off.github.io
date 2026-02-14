@@ -107,7 +107,6 @@ const subtitulosCanciones = [
         "y se apasiona por una mujer",
         "Convierte su amor en su vida,",
         "su comida y bebida en la justa medida..."
-
     ],
 
     // Canción 2
@@ -478,7 +477,7 @@ function pasarAFinal(){
     audioOceano.play().catch(()=>{});
 
     subtitulos.style.display = "block";
-iniciarSubtitulosCancion(indiceOceano);
+    iniciarSubtitulosCancion(indiceOceano);
 }
 
 /* ==========================================
@@ -604,6 +603,7 @@ function animar(){
         drawOcean();
     }
 }
+
 
 
 
