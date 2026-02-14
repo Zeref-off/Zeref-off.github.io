@@ -67,7 +67,7 @@ font-size:15px;
 #screenScene{
     background: 
         linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.65)),
-        url("lotos.jpg");
+        url("lotos.png");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -89,4 +89,5 @@ font-size:15px;
 #contador{
     z-index: 2;
 }
+
 
