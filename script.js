@@ -274,60 +274,40 @@ function ola(p, t){
     return p.baseY + (w1 + w2*0.6 + w3*0.3)*p.amp;
 }
 
-function drawCielo(){
-    let grad = ctx.createLinearGradient(0,0,0,H);
-    grad.addColorStop(0,"#000814");
-    grad.addColorStop(1,"#00111f");
-    ctx.fillStyle = grad;
-    ctx.fillRect(0,0,W,H);
+/* ==========================================
+   FONDO IMAGEN FINAL
+========================================== */
+const fondoFinal = new Image();
+fondoFinal.src = "fondo_final.jpg";
 
+
+function drawCielo(){
+
+    // Dibujar imagen de fondo
+    if(fondoFinal.complete){
+        ctx.drawImage(fondoFinal, 0, 0, W, H);
+    }else{
+        // Fondo negro mientras carga
+        ctx.fillStyle = "#000";
+        ctx.fillRect(0,0,W,H);
+    }
+
+    // Luna (se mantiene igual)
     let moonX = W * 0.8;
     let moonY = H * 0.15;
-    let r = 40;
 
-    // ===== HALO EXTERIOR (atmósfera) =====
-    let haloGrande = ctx.createRadialGradient(
-        moonX, moonY, r*0.5,
-        moonX, moonY, r*6
-    );
-    haloGrande.addColorStop(0, "rgba(255,255,220,0.15)");
-    haloGrande.addColorStop(1, "rgba(255,255,220,0)");
+    let glow = ctx.createRadialGradient(moonX, moonY, 0, moonX, moonY, 120);
+    glow.addColorStop(0,"rgba(255,255,220,0.7)");
+    glow.addColorStop(1,"rgba(255,255,220,0)");
 
+    ctx.fillStyle = glow;
     ctx.beginPath();
-    ctx.arc(moonX, moonY, r*6, 0, Math.PI*2);
-    ctx.fillStyle = haloGrande;
+    ctx.arc(moonX, moonY, 120, 0, Math.PI*2);
     ctx.fill();
 
-    // ===== HALO MEDIO =====
-    let haloMedio = ctx.createRadialGradient(
-        moonX, moonY, r*0.2,
-        moonX, moonY, r*2.5
-    );
-    haloMedio.addColorStop(0, "rgba(255,255,240,0.35)");
-    haloMedio.addColorStop(1, "rgba(255,255,240,0)");
-
+    ctx.fillStyle="#fff8cc";
     ctx.beginPath();
-    ctx.arc(moonX, moonY, r*2.5, 0, Math.PI*2);
-    ctx.fillStyle = haloMedio;
-    ctx.fill();
-
-    // ===== CUERPO DE LA LUNA (gradiente) =====
-    let moonGrad = ctx.createRadialGradient(
-        moonX - r*0.3, moonY - r*0.3, r*0.2,
-        moonX, moonY, r
-    );
-    moonGrad.addColorStop(0, "#ffffff");
-    moonGrad.addColorStop(1, "#fff2b0");
-
-    ctx.beginPath();
-    ctx.arc(moonX, moonY, r, 0, Math.PI*2);
-    ctx.fillStyle = moonGrad;
-    ctx.fill();
-
-    // ===== PUNTO DE BRILLO =====
-    ctx.beginPath();
-    ctx.arc(moonX - r*0.3, moonY - r*0.3, r*0.25, 0, Math.PI*2);
-    ctx.fillStyle = "rgba(255,255,255,0.7)";
+    ctx.arc(moonX, moonY, 40, 0, Math.PI*2);
     ctx.fill();
 }
 
@@ -390,5 +370,6 @@ function animar(){
 
     drawFade();
 }
+
 
 
