@@ -1,7 +1,7 @@
 /* ==========================================
    FATUM AMANTIS – CINE PREMIUM SECUENCIAL
 ========================================== */
-
+const subtitulos = document.getElementById("subtitulos");
 const screenInicio = document.getElementById("screenInicio");
 const screenScene = document.getElementById("screenScene");
 const startBox = document.getElementById("startBox");
@@ -232,6 +232,9 @@ function pasarAFinal(){
     audioOceano.src = playlistOceano[indiceOceano];
     audioOceano.volume = 0.6;
     audioOceano.play().catch(()=>{});
+
+    subtitulos.style.opacity = 1;
+    subtitulos.innerText = "Aquí aparecerá la letra de la canción, Aquí aparecerá la letra de la canciónAquí aparecerá la letra de la canciónAquí aparecerá la letra de la canciónAquí aparecerá la letra de la canción";
 }
 
 /* ==========================================
@@ -357,5 +360,6 @@ function animar(){
         drawOcean();
     }
 }
+
 
 
