@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
 
 /* ==========================================
-   ELEMENTOS (SEGUROS)
+   ELEMENTOS
 ========================================== */
 
 const subtitulos = document.getElementById("subtitulos");
@@ -63,7 +63,7 @@ let indiceOceano = 0;
 const audioOceano = new Audio(playlistOceano[0]);
 
 /* ==========================================
-   SUBTÍTULOS
+   SUBTÍTULOS (secuenciales por canción)
 ========================================== */
 
 const subtitulosCanciones = [
@@ -86,6 +86,7 @@ const subtitulosCanciones = [
         "Texto canción 4...",
         "Más texto canción 4..."
     ]
+    // Canción 5 sin subtítulos
 ];
 
 let intervaloEscritura;
@@ -93,8 +94,6 @@ let intervaloBorrado;
 let indiceLinea = 0;
 
 function mostrarLinea(texto, callback){
-
-    if(!subtitulos) return;
 
     subtitulos.innerHTML = "";
     subtitulos.style.opacity = 1;
@@ -104,6 +103,7 @@ function mostrarLinea(texto, callback){
     clearInterval(intervaloEscritura);
     clearInterval(intervaloBorrado);
 
+    // ESCRITURA
     intervaloEscritura = setInterval(()=>{
         subtitulos.innerHTML += texto[i];
         i++;
@@ -111,8 +111,8 @@ function mostrarLinea(texto, callback){
         if(i >= texto.length){
             clearInterval(intervaloEscritura);
 
+            // pausa antes de borrar
             setTimeout(()=>{
-
                 let contenido = subtitulos.innerHTML;
 
                 intervaloBorrado = setInterval(()=>{
@@ -123,21 +123,17 @@ function mostrarLinea(texto, callback){
                         clearInterval(intervaloBorrado);
                         if(callback) callback();
                     }
-                }, 15);
+                }, 20);
 
-            }, 1500);
+            }, 2000);
         }
 
-    }, 30);
+    }, 35);
 }
 
 function iniciarSubtitulosCancion(indice){
 
-    if(!subtitulos) return;
-
-    clearInterval(intervaloEscritura);
-    clearInterval(intervaloBorrado);
-
+    // Si es la canción 5 → sin subtítulos
     if(indice >= subtitulosCanciones.length){
         subtitulos.style.opacity = 0;
         return;
@@ -148,7 +144,9 @@ function iniciarSubtitulosCancion(indice){
 
     function siguiente(){
 
+        // seguridad: si cambió de canción, detener
         if(indiceOceano !== indice) return;
+
         if(indiceLinea >= lineas.length) return;
 
         mostrarLinea(lineas[indiceLinea], ()=>{
@@ -160,10 +158,14 @@ function iniciarSubtitulosCancion(indice){
     siguiente();
 }
 
+// Cambio de canción océano
 audioOceano.addEventListener("ended", () => {
 
     indiceOceano++;
-    if(indiceOceano >= playlistOceano.length) indiceOceano = 0;
+
+    if(indiceOceano >= playlistOceano.length){
+        indiceOceano = 0;
+    }
 
     audioOceano.src = playlistOceano[indiceOceano];
     audioOceano.play().catch(()=>{});
@@ -178,7 +180,7 @@ audioOceano.addEventListener("ended", () => {
 let estado = "inicio";
 
 /* ==========================================
-   MATRIX (SEGURO)
+   MATRIX
 ========================================== */
 
 function drawMatrix(){
@@ -191,7 +193,7 @@ function drawMatrix(){
     mtx.fillStyle = "#ff4d6d";
     mtx.font = "20px monospace";
 
-    for(let i=0;i<50;i++){
+    for(let i=0;i<40;i++){
         mtx.fillText("F", Math.random()*W, Math.random()*H);
     }
 }
@@ -199,7 +201,7 @@ function drawMatrix(){
 setInterval(drawMatrix, 60);
 
 /* ==========================================
-   NIEVE / OCEANO
+   NIEVE
 ========================================== */
 
 let snow = [];
@@ -234,32 +236,18 @@ function drawSnow(){
 }
 
 /* ==========================================
-   POEMAS
-========================================== */
-
-function escribirPoema(el, texto, velocidad){
-    if(!el) return;
-
-    el.innerHTML = "";
-    let i = 0;
-
-    let inter = setInterval(()=>{
-        el.innerHTML += texto[i];
-        i++;
-        if(i >= texto.length) clearInterval(inter);
-    }, velocidad);
-}
-
-/* ==========================================
    TRANSICIONES
 ========================================== */
 
 function iniciar(){
 
-    if(startBox) startBox.style.display = "none";
+    startBox.style.display = "none";
 
     audioInicio.volume = 0.6;
     audioInicio.play().catch(()=>{});
+
+    // Fallback: si el audio no dispara "ended"
+    setTimeout(pasarAPoemas, 4000);
 }
 window.iniciar = iniciar;
 
@@ -270,8 +258,8 @@ function pasarAPoemas(){
 
     estado = "poemas";
 
-    if(screenInicio) screenInicio.classList.remove("active");
-    if(screenScene) screenScene.classList.add("active");
+    screenInicio.classList.remove("active");
+    screenScene.classList.add("active");
 
     audioPoemas.play().catch(()=>{});
 
@@ -283,6 +271,9 @@ function pasarAFinal(){
 
     estado = "final";
 
+    // Activar fondo océano
+    screenScene.classList.add("final");
+
     if(poemaLeft) poemaLeft.style.display = "none";
     if(poemaRight) poemaRight.style.display = "none";
     if(contadorEl) contadorEl.style.display = "none";
@@ -291,10 +282,8 @@ function pasarAFinal(){
     audioOceano.src = playlistOceano[0];
     audioOceano.play().catch(()=>{});
 
-    if(subtitulos){
-        subtitulos.style.display = "block";
-        iniciarSubtitulosCancion(0);
-    }
+    subtitulos.style.display = "block";
+    iniciarSubtitulosCancion(0);
 }
 
 /* ==========================================
@@ -315,4 +304,5 @@ function animar(){
 }
 
 });
+
 
