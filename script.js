@@ -1,56 +1,48 @@
-document.addEventListener("DOMContentLoaded", () => {
-
 /* ==========================================
-   ELEMENTOS
+   FATUM AMANTIS – CINE PREMIUM SECUENCIAL
 ========================================== */
-
 const subtitulos = document.getElementById("subtitulos");
 const screenInicio = document.getElementById("screenInicio");
 const screenScene = document.getElementById("screenScene");
 const startBox = document.getElementById("startBox");
 
 const matrixCanvas = document.getElementById("matrixCanvas");
+const mtx = matrixCanvas.getContext("2d");
+
 const canvas = document.getElementById("sceneCanvas");
+const ctx = canvas.getContext("2d");
 
 const poemaLeft = document.getElementById("poemaLeft");
 const poemaRight = document.getElementById("poemaRight");
 const contadorEl = document.getElementById("contador");
 
-const mtx = matrixCanvas ? matrixCanvas.getContext("2d") : null;
-const ctx = canvas ? canvas.getContext("2d") : null;
-
 /* ==========================================
    SIZE
 ========================================== */
 
-let W = window.innerWidth;
-let H = window.innerHeight;
-
+let W, H;
 function resize(){
     W = window.innerWidth;
     H = window.innerHeight;
-
-    if(canvas){
-        canvas.width = W;
-        canvas.height = H;
-    }
-
-    if(matrixCanvas){
-        matrixCanvas.width = W;
-        matrixCanvas.height = H;
-    }
+    canvas.width = W;
+    canvas.height = H;
+    matrixCanvas.width = W;
+    matrixCanvas.height = H;
 }
-
 window.addEventListener("resize", resize);
 resize();
 
 /* ==========================================
-   AUDIO
+   AUDIO SECUENCIAL
 ========================================== */
 
+// Escena 1
 const audioInicio = new Audio("inicio.mp3");
+
+// Escena 2
 const audioPoemas = new Audio("poemas.mp3");
 
+// Escena 3 (playlist)
 const playlistOceano = [
     "oceano1.mp3",
     "oceano2.mp3",
@@ -60,144 +52,54 @@ const playlistOceano = [
 ];
 
 let indiceOceano = 0;
-const audioOceano = new Audio(playlistOceano[0]);
+const audioOceano = new Audio(playlistOceano[indiceOceano]);
 
-/* ==========================================
-   SUBTÍTULOS (secuenciales por canción)
-========================================== */
-
-const subtitulosCanciones = [
-    [
-        "Quiero ser tu canción desde el principio al fin",
-        "Quiero rozarme en tus labios y ser tu carmín",
-        "Ser la luz que acompaña tu despertar",
-        "Y el silencio donde puedas descansar"
-    ],
-    [
-        "¿Puedo llegar a tu alma?",
-        "No quiero dejarte ir",
-        "Mi único sueño es tú y yo"
-    ],
-    [
-        "Texto canción 3...",
-        "Más texto canción 3..."
-    ],
-    [
-        "Texto canción 4...",
-        "Más texto canción 4..."
-    ]
-    // Canción 5 sin subtítulos
-];
-
-let intervaloEscritura;
-let intervaloBorrado;
-let indiceLinea = 0;
-
-function mostrarLinea(texto, callback){
-
-    subtitulos.innerHTML = "";
-    subtitulos.style.opacity = 1;
-
-    let i = 0;
-
-    clearInterval(intervaloEscritura);
-    clearInterval(intervaloBorrado);
-
-    // ESCRITURA
-    intervaloEscritura = setInterval(()=>{
-        subtitulos.innerHTML += texto[i];
-        i++;
-
-        if(i >= texto.length){
-            clearInterval(intervaloEscritura);
-
-            // pausa antes de borrar
-            setTimeout(()=>{
-                let contenido = subtitulos.innerHTML;
-
-                intervaloBorrado = setInterval(()=>{
-                    contenido = contenido.slice(0,-1);
-                    subtitulos.innerHTML = contenido;
-
-                    if(contenido.length === 0){
-                        clearInterval(intervaloBorrado);
-                        if(callback) callback();
-                    }
-                }, 20);
-
-            }, 2000);
-        }
-
-    }, 35);
-}
-
-function iniciarSubtitulosCancion(indice){
-
-    // Si es la canción 5 → sin subtítulos
-    if(indice >= subtitulosCanciones.length){
-        subtitulos.style.opacity = 0;
-        return;
-    }
-
-    const lineas = subtitulosCanciones[indice];
-    indiceLinea = 0;
-
-    function siguiente(){
-
-        // seguridad: si cambió de canción, detener
-        if(indiceOceano !== indice) return;
-
-        if(indiceLinea >= lineas.length) return;
-
-        mostrarLinea(lineas[indiceLinea], ()=>{
-            indiceLinea++;
-            siguiente();
-        });
-    }
-
-    siguiente();
-}
-
-// Cambio de canción océano
+// Playlist en bucle
 audioOceano.addEventListener("ended", () => {
-
     indiceOceano++;
-
-    if(indiceOceano >= playlistOceano.length){
-        indiceOceano = 0;
-    }
-
+    if(indiceOceano >= playlistOceano.length) indiceOceano = 0;
     audioOceano.src = playlistOceano[indiceOceano];
-    audioOceano.play().catch(()=>{});
-
-    iniciarSubtitulosCancion(indiceOceano);
+    audioOceano.play();
 });
+
+// Transiciones automáticas
+audioInicio.addEventListener("ended", pasarAPoemas);
+audioPoemas.addEventListener("ended", pasarAFinal);
 
 /* ==========================================
    ESTADOS
 ========================================== */
 
-let estado = "inicio";
+let estado = "inicio"; // inicio → poemas → final
 
 /* ==========================================
    MATRIX
 ========================================== */
 
-function drawMatrix(){
+const matrixText = "Fatum Amantis";
+const fontSize = 22;
+let cols = Math.floor(W / fontSize);
+let drops = Array(cols).fill(0);
 
-    if(!mtx || estado !== "inicio") return;
+function drawMatrix(){
+    if(estado !== "inicio") return;
 
     mtx.fillStyle = "rgba(0,0,0,0.08)";
     mtx.fillRect(0,0,W,H);
 
     mtx.fillStyle = "#ff4d6d";
-    mtx.font = "20px monospace";
+    mtx.font = fontSize + "px monospace";
 
-    for(let i=0;i<40;i++){
-        mtx.fillText("F", Math.random()*W, Math.random()*H);
+    for(let i=0;i<drops.length;i++){
+        let char = matrixText[Math.floor(Math.random()*matrixText.length)];
+        mtx.fillText(char, i*fontSize, drops[i]*fontSize);
+
+        if(drops[i]*fontSize > H && Math.random()>0.96){
+            drops[i]=0;
+        }
+        drops[i]++;
     }
 }
-
 setInterval(drawMatrix, 60);
 
 /* ==========================================
@@ -208,7 +110,7 @@ let snow = [];
 
 function initSnow(){
     snow = [];
-    for(let i=0;i<200;i++){
+    for(let i=0;i<240;i++){
         snow.push({
             x: Math.random()*W,
             y: Math.random()*H,
@@ -219,8 +121,6 @@ function initSnow(){
 }
 
 function drawSnow(){
-    if(!ctx) return;
-
     ctx.fillStyle="white";
     for(let s of snow){
         ctx.beginPath();
@@ -236,23 +136,66 @@ function drawSnow(){
 }
 
 /* ==========================================
-   TRANSICIONES
+   POEMAS
+========================================== */
+
+const texto1 = `AMO ELEGIRTE
+Tantas almas magicas en este mundo,
+pero es la tuya la unica que quiero,
+es tu sonrisa la que acelera mis
+latidos y es tu mano la que siempre
+deseo sujetar.
+Es a tu lado donde siento que todo
+tiene sentido y se tambien que eres
+tu mi mas bonita decision.`;
+
+const texto2 = `Me enamore de ti desde 
+aquel instante en que llegaste a mi vida 
+sin previo aviso cuando ni siquiera 
+imaginaba que alguien tan especial como 
+tu apareceria y es que contigo aprendi 
+que el amor no se busca simplemente llega
+y te transforma, desde el primer dia supe 
+que habia algo distinto en ti, algo que te
+hacia brillar mas que a las demas, algo
+que me atrapo y me hizo sentir que eras
+tu lo que siempre habia estado esperando`;
+
+function escribirPoema(el, texto, velocidad, callback){
+    el.style.opacity = 1;
+    el.innerHTML = "";
+    let i = 0;
+
+    let inter = setInterval(()=>{
+        el.innerHTML += texto[i];
+        i++;
+
+        if(i >= texto.length){
+            clearInterval(inter);
+            if(callback) callback();
+        }
+    }, velocidad);
+}
+
+/* ==========================================
+   INICIAR (BOTÓN)
 ========================================== */
 
 function iniciar(){
 
+    // Oculta solo el botón
     startBox.style.display = "none";
 
+    // Reproducir música de la primera escena
+    audioInicio.currentTime = 0;
     audioInicio.volume = 0.6;
     audioInicio.play().catch(()=>{});
-
-    // Fallback: si el audio no dispara "ended"
-    setTimeout(pasarAPoemas, 4000);
 }
 window.iniciar = iniciar;
 
-audioInicio.addEventListener("ended", pasarAPoemas);
-audioPoemas.addEventListener("ended", pasarAFinal);
+/* ==========================================
+   TRANSICIONES
+========================================== */
 
 function pasarAPoemas(){
 
@@ -261,9 +204,17 @@ function pasarAPoemas(){
     screenInicio.classList.remove("active");
     screenScene.classList.add("active");
 
+    audioPoemas.currentTime = 0;
+    audioPoemas.volume = 0.6;
     audioPoemas.play().catch(()=>{});
 
     initSnow();
+    crearOceano();
+
+    escribirPoema(poemaLeft, texto1, 60, ()=>{
+        escribirPoema(poemaRight, texto2, 60);
+    });
+
     animar();
 }
 
@@ -271,19 +222,123 @@ function pasarAFinal(){
 
     estado = "final";
 
-    // Activar fondo océano
+    poemaLeft.style.display = "none";
+    poemaRight.style.display = "none";
+    contadorEl.style.display = "none";
+
     screenScene.classList.add("final");
 
-    if(poemaLeft) poemaLeft.style.display = "none";
-    if(poemaRight) poemaRight.style.display = "none";
-    if(contadorEl) contadorEl.style.display = "none";
-
     indiceOceano = 0;
-    audioOceano.src = playlistOceano[0];
+    audioOceano.src = playlistOceano[indiceOceano];
+    audioOceano.volume = 0.6;
     audioOceano.play().catch(()=>{});
 
-    subtitulos.style.display = "block";
-    iniciarSubtitulosCancion(0);
+    subtitulos.style.opacity = 1;
+    subtitulos.innerText = "Aquí aparecerá la letra de la canción, Aquí aparecerá la letra de la canciónAquí aparecerá la letra de la canciónAquí aparecerá la letra de la canciónAquí aparecerá la letra de la canción";
+}
+
+/* ==========================================
+   OCEANO CINEMATOGRÁFICO ORIGINAL
+========================================== */
+
+let particulas = [];
+let tiempo = 0;
+let camX = 0;
+let camY = 0;
+
+function crearOceano(){
+    particulas = [];
+
+    const capas = 7;
+
+    for(let c = 0; c < capas; c++){
+
+        let profundidad = c / capas;
+        let cantidad = 500 + c * 250;
+
+        for(let i=0;i<cantidad;i++){
+            particulas.push({
+                x: Math.random()*W,
+                baseY: H*(0.45 + profundidad*0.55),
+                profundidad: profundidad,
+                amp: 40 + profundidad*140,
+                freq: 0.0015 + Math.random()*0.002,
+                speed: 0.4 + profundidad*2,
+                size: 1 + profundidad*3,
+                fase: Math.random()*Math.PI*2
+            });
+        }
+    }
+}
+
+function ola(p, t){
+    let w1 = Math.sin(p.x*p.freq + t*p.speed + p.fase);
+    let w2 = Math.sin(p.x*p.freq*0.5 + t*p.speed*0.7);
+    let w3 = Math.sin(p.x*p.freq*2 + t*p.speed*1.2);
+    return p.baseY + (w1 + w2*0.6 + w3*0.3)*p.amp;
+}
+
+function drawCielo(){
+
+    let grad = ctx.createLinearGradient(0,0,0,H);
+    grad.addColorStop(0,"rgba(0,8,20,0.6)");
+    grad.addColorStop(1,"rgba(0,17,31,0.8)");
+
+    ctx.fillStyle = grad;
+    ctx.fillRect(0,0,W,H);
+
+    let moonX = W * 0.8;
+    let moonY = H * 0.15;
+
+    let glow = ctx.createRadialGradient(moonX, moonY, 0, moonX, moonY, 140);
+    glow.addColorStop(0,"rgba(255,255,220,0.8)");
+    glow.addColorStop(0.4,"rgba(255,255,220,0.4)");
+    glow.addColorStop(1,"rgba(255,255,220,0)");
+
+    ctx.fillStyle = glow;
+    ctx.beginPath();
+    ctx.arc(moonX, moonY, 140, 0, Math.PI*2);
+    ctx.fill();
+
+    ctx.fillStyle="#fff8cc";
+    ctx.beginPath();
+    ctx.arc(moonX, moonY, 40, 0, Math.PI*2);
+    ctx.fill();
+}
+
+function drawOcean(){
+
+    camX = Math.sin(tiempo*0.15)*18;
+    camY = Math.sin(tiempo*0.12)*8;
+
+    ctx.save();
+    ctx.translate(camX, camY);
+
+    for(let p of particulas){
+
+        let y = ola(p, tiempo);
+
+        p.x += p.profundidad*0.4;
+        if(p.x > W) p.x = 0;
+
+        let blue = 100 + p.profundidad*130;
+        let alpha = 0.25 + p.profundidad*0.7;
+
+        ctx.fillStyle = `rgba(0,${blue},255,${alpha})`;
+        ctx.beginPath();
+        ctx.arc(p.x,y,p.size,0,Math.PI*2);
+        ctx.fill();
+
+        let crest = Math.sin(p.x*p.freq + tiempo*p.speed + p.fase);
+        if(crest>0.94 && p.profundidad>0.6){
+            ctx.fillStyle="rgba(255,255,255,0.9)";
+            ctx.beginPath();
+            ctx.arc(p.x,y-p.size*2,p.size*1.2,0,Math.PI*2);
+            ctx.fill();
+        }
+    }
+
+    ctx.restore();
 }
 
 /* ==========================================
@@ -291,18 +346,18 @@ function pasarAFinal(){
 ========================================== */
 
 function animar(){
-
     requestAnimationFrame(animar);
-
-    if(!ctx) return;
+    tiempo += 0.01;
 
     ctx.clearRect(0,0,W,H);
 
     if(estado === "poemas"){
         drawSnow();
     }
+
+    if(estado === "final"){
+        drawCielo();
+        drawOcean();
+    }
 }
-
-});
-
 
