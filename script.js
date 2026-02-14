@@ -1,6 +1,7 @@
 /* ==========================================
    FATUM AMANTIS – CINE PREMIUM SECUENCIAL
 ========================================== */
+
 const subtitulos = document.getElementById("subtitulos");
 const screenInicio = document.getElementById("screenInicio");
 const screenScene = document.getElementById("screenScene");
@@ -51,15 +52,78 @@ const playlistOceano = [
     "oceano5.mp3"
 ];
 
+// Subtítulos por canción (puedes editarlos)
+const subtitulosOceano = [
+`Letra de la canción 1...
+Texto de ejemplo para el océano.
+Letra de la canción 1...
+Texto de ejemplo para el océano.
+Letra de la canción 1...
+Texto de ejemplo para el océano.
+Letra de la canción 1...
+Texto de ejemplo para el océano.
+Letra de la canción 1...
+Texto de ejemplo para el océano.
+Letra de la canción 1...
+Texto de ejemplo para el océano.`,
+
+`Letra de la canción 2...
+Aquí puedes colocar la letra real.
+Letra de la canción 1...
+Texto de ejemplo para el océano.
+Letra de la canción 1...
+Texto de ejemplo para el océano.
+Letra de la canción 1...
+Texto de ejemplo para el océano.
+Letra de la canción 1...
+Texto de ejemplo para el océano.`,
+
+`Letra de la canción 3...
+Mensaje emocional o romántico.
+Letra de la canción 1...
+Texto de ejemplo para el océano.
+Letra de la canción 1...
+Texto de ejemplo para el océano.
+Letra de la canción 1...
+Texto de ejemplo para el océano.
+Letra de la canción 1...
+Texto de ejemplo para el océano.`,
+
+`Letra de la canción 4...
+Texto que acompañe la atmósfera.
+Letra de la canción 1...
+Texto de ejemplo para el océano.
+Letra de la canción 1...
+Texto de ejemplo para el océano.
+Letra de la canción 1...
+Texto de ejemplo para el océano.
+Letra de la canción 1...
+Texto de ejemplo para el océano.`,
+
+`Letra de la canción 5...
+Final del viaje en el océano.
+Letra de la canción 1...
+Texto de ejemplo para el océano.
+Letra de la canción 1...
+Texto de ejemplo para el océano.
+Letra de la canción 1...
+Texto de ejemplo para el océano.
+Letra de la canción 1...
+Texto de ejemplo para el océano.`
+];
+
 let indiceOceano = 0;
 const audioOceano = new Audio(playlistOceano[indiceOceano]);
 
-// Playlist en bucle
+// Cambio automático de canciones + subtítulos
 audioOceano.addEventListener("ended", () => {
     indiceOceano++;
     if(indiceOceano >= playlistOceano.length) indiceOceano = 0;
+
     audioOceano.src = playlistOceano[indiceOceano];
-    audioOceano.play();
+    audioOceano.play().catch(()=>{});
+
+    escribirSubtitulos(subtitulosOceano[indiceOceano]);
 });
 
 // Transiciones automáticas
@@ -70,7 +134,7 @@ audioPoemas.addEventListener("ended", pasarAFinal);
    ESTADOS
 ========================================== */
 
-let estado = "inicio"; // inicio → poemas → final
+let estado = "inicio";
 
 /* ==========================================
    MATRIX
@@ -139,7 +203,7 @@ function drawSnow(){
    POEMAS
 ========================================== */
 
-const texto1 = `AMO ELEGIRTE
+const texto1 = `AMO ELEGIRTE       
 Tantas almas magicas en este mundo,
 pero es la tuya la unica que quiero,
 es tu sonrisa la que acelera mis
@@ -159,7 +223,7 @@ y te transforma, desde el primer dia supe
 que habia algo distinto en ti, algo que te
 hacia brillar mas que a las demas, algo
 que me atrapo y me hizo sentir que eras
-tu lo que siempre habia estado esperando`;
+tu lo que siempre habia estado esperando.`;
 
 function escribirPoema(el, texto, velocidad, callback){
     el.style.opacity = 1;
@@ -178,15 +242,46 @@ function escribirPoema(el, texto, velocidad, callback){
 }
 
 /* ==========================================
-   INICIAR (BOTÓN)
+   SUBTÍTULOS – EFECTO PROGRESIVO
+========================================== */
+
+let intervaloSubtitulos;
+
+function escribirSubtitulos(texto, velocidad = 35){
+
+    // Fade out
+    subtitulos.style.opacity = 0;
+
+    setTimeout(()=>{
+
+        subtitulos.innerHTML = "";
+        subtitulos.style.opacity = 1;
+
+        let i = 0;
+        clearInterval(intervaloSubtitulos);
+
+        intervaloSubtitulos = setInterval(()=>{
+
+            subtitulos.innerHTML += texto[i];
+            i++;
+
+            if(i >= texto.length){
+                clearInterval(intervaloSubtitulos);
+            }
+
+        }, velocidad);
+
+    }, 800);
+}
+
+/* ==========================================
+   INICIAR
 ========================================== */
 
 function iniciar(){
 
-    // Oculta solo el botón
     startBox.style.display = "none";
 
-    // Reproducir música de la primera escena
     audioInicio.currentTime = 0;
     audioInicio.volume = 0.6;
     audioInicio.play().catch(()=>{});
@@ -233,8 +328,8 @@ function pasarAFinal(){
     audioOceano.volume = 0.6;
     audioOceano.play().catch(()=>{});
 
-    subtitulos.style.opacity = 1;
-    subtitulos.innerText = "Aquí aparecerá la letra de la canción, Aquí aparecerá la letra de la canciónAquí aparecerá la letra de la canciónAquí aparecerá la letra de la canciónAquí aparecerá la letra de la canción";
+    subtitulos.style.display = "block";
+    escribirSubtitulos(subtitulosOceano[0]);
 }
 
 /* ==========================================
@@ -248,11 +343,9 @@ let camY = 0;
 
 function crearOceano(){
     particulas = [];
-
     const capas = 7;
 
     for(let c = 0; c < capas; c++){
-
         let profundidad = c / capas;
         let cantidad = 500 + c * 250;
 
@@ -279,31 +372,12 @@ function ola(p, t){
 }
 
 function drawCielo(){
-
     let grad = ctx.createLinearGradient(0,0,0,H);
     grad.addColorStop(0,"rgba(0,8,20,0.6)");
     grad.addColorStop(1,"rgba(0,17,31,0.8)");
 
     ctx.fillStyle = grad;
     ctx.fillRect(0,0,W,H);
-
-    let moonX = W * 0.8;
-    let moonY = H * 0.15;
-
-    let glow = ctx.createRadialGradient(moonX, moonY, 0, moonX, moonY, 140);
-    glow.addColorStop(0,"rgba(255,255,220,0.8)");
-    glow.addColorStop(0.4,"rgba(255,255,220,0.4)");
-    glow.addColorStop(1,"rgba(255,255,220,0)");
-
-    ctx.fillStyle = glow;
-    ctx.beginPath();
-    ctx.arc(moonX, moonY, 140, 0, Math.PI*2);
-    ctx.fill();
-
-    ctx.fillStyle="#fff8cc";
-    ctx.beginPath();
-    ctx.arc(moonX, moonY, 40, 0, Math.PI*2);
-    ctx.fill();
 }
 
 function drawOcean(){
@@ -328,14 +402,6 @@ function drawOcean(){
         ctx.beginPath();
         ctx.arc(p.x,y,p.size,0,Math.PI*2);
         ctx.fill();
-
-        let crest = Math.sin(p.x*p.freq + tiempo*p.speed + p.fase);
-        if(crest>0.94 && p.profundidad>0.6){
-            ctx.fillStyle="rgba(255,255,255,0.9)";
-            ctx.beginPath();
-            ctx.arc(p.x,y-p.size*2,p.size*1.2,0,Math.PI*2);
-            ctx.fill();
-        }
     }
 
     ctx.restore();
