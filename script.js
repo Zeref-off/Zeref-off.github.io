@@ -120,16 +120,28 @@ function drawSnow(){
 ========================================== */
 
 const texto1 =
-`Eres el instante donde el tiempo respira,
-la pausa entre mis latidos,
-el destino que llegó sin avisar
-y decidió quedarse.`;
+`AMO ELEGIRTE
+Tantas almas magicas en este mundo,
+pero es la tuya la unica que quiero,
+es tu sonrisa la que acelera mis
+latidos y es tu mano la que siempre
+deseo sujetar.
+Es a tu lado donde siento que todo
+tiene sentido y se tambien que eres
+tu mi mas bonita decision.`;
 
 const texto2 =
-`Y si el mundo terminara mañana,
-volvería a encontrarte,
-porque mi universo
-comienza y termina en ti.`;
+`Me enamore de ti desde aquel instante
+en que llegaste a mi vida sin previo
+aviso cuando ni siquiera imaginaba que
+alguien tan especial como tu apareceria
+y es que contigo aprendi que el amor no
+se busca simplemente llega y te
+transforma, desde el primer dia supe que
+habia algo distinto en ti, algo que te
+hacia brillar mas que a las demas, algo
+que me atrapo y me hizo sentir que eras
+tu lo que siempre habia estado esperando`;
 
 function escribirPoema(el, texto, velocidad, callback){
     el.style.opacity = 1;
@@ -371,6 +383,7 @@ function animar(){
 
     drawFade();
 }
+
 
 
 
