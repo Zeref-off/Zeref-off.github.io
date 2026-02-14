@@ -114,7 +114,7 @@ function detenerTodos(){
 
 let estado = "inicio"; // inicio → poemas → fade → final
 let fadeAlpha = 0;
-let fadeOut = false;
+let fadeOutEscena = false;
 
 /* ==========================================
    MATRIX
@@ -289,11 +289,11 @@ window.iniciar = iniciar;
 ========================================== */
 
 function iniciarFadeFinal(){
-    fadeOut = true;
+    fadeOutEscena = true;
 }
 
 function drawFade(){
-    if(!fadeOut) return;
+    if(!fadeOutEscena) return;
 
     fadeAlpha += 0.01;
 
@@ -302,7 +302,7 @@ function drawFade(){
 
     if(fadeAlpha >= 1){
         estado = "final";
-        fadeOut = false;
+        fadeOutEscena = false;
         fadeAlpha = 0;
 
         // Ocultar elementos de la segunda escena
@@ -457,6 +457,7 @@ function animar(){
 window.addEventListener("load", () => {
     fadeIn(audioInicio, 0.4);
 });
+
 
 
 
