@@ -274,8 +274,8 @@ function iniciar(){
     initSnow();
     crearOceano();
 
-    escribirPoema(poemaLeft, texto1, 40, ()=>{
-        escribirPoema(poemaRight, texto2, 40, ()=>{
+    escribirPoema(poemaLeft, texto1, 60, ()=>{
+        escribirPoema(poemaRight, texto2, 60, ()=>{
             iniciarContador();
         });
     });
@@ -457,5 +457,6 @@ function animar(){
 window.addEventListener("load", () => {
     fadeIn(audioInicio, 0.4);
 });
+
 
 
