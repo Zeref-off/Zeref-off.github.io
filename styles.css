@@ -103,5 +103,27 @@ font-size:15px;
     background-repeat: no-repeat;
 }
 
+/* ==========================================
+   SUBTÍTULOS – ESCENA FINAL
+========================================== */
+
+.subtitulos{
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%, -50%);
+    width:70%;
+    text-align:center;
+    font-size:28px;
+    line-height:1.5;
+    color:#7fdfff; /* azul marino luminoso */
+    text-shadow:
+        0 0 10px rgba(0,200,255,0.8),
+        0 0 25px rgba(0,150,255,0.6);
+    opacity:0;
+    transition:opacity 1.5s ease;
+    z-index:3;
+}
+
 
 
