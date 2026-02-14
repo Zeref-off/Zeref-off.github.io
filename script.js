@@ -35,14 +35,78 @@ window.addEventListener("resize", resize);
 resize();
 
 /* ==========================================
-   AUDIO AMBIENTAL (olas)
+   AUDIO CINE PREMIUM
 ========================================== */
 
-const audioOlas = new Audio(
-"https://cdn.pixabay.com/download/audio/2022/03/15/audio_8f1a3e7c42.mp3?filename=ocean-waves-ambient-110624.mp3"
-);
-audioOlas.loop = true;
-audioOlas.volume = 0.35;
+// ---------- ESCENA INICIO ----------
+const audioInicio = new Audio("inicio.mp3");
+audioInicio.loop = true;
+audioInicio.volume = 0;
+
+// ---------- ESCENA POEMAS ----------
+const audioPoemas = new Audio("poemas.mp3");
+audioPoemas.loop = true;
+audioPoemas.volume = 0;
+
+// ---------- ESCENA FINAL (PLAYLIST OCEANO) ----------
+const playlistOceano = [
+    "oceano1.mp3",
+    "oceano2.mp3",
+    "oceano3.mp3",
+    "oceano4.mp3",
+    "oceano5.mp3"
+];
+
+let indiceOceano = 0;
+const audioOceano = new Audio(playlistOceano[indiceOceano]);
+audioOceano.volume = 0;
+
+// Cuando termina una canción → siguiente
+audioOceano.addEventListener("ended", () => {
+    indiceOceano++;
+    if(indiceOceano >= playlistOceano.length){
+        indiceOceano = 0;
+    }
+    audioOceano.src = playlistOceano[indiceOceano];
+    audioOceano.play();
+});
+
+/* ==========================================
+   CONTROL DE AUDIO (FADE)
+========================================== */
+
+function fadeIn(audio, target = 0.5, speed = 0.02){
+    audio.play().catch(()=>{});
+    let f = setInterval(()=>{
+        if(audio.volume < target){
+            audio.volume += speed;
+        }else{
+            audio.volume = target;
+            clearInterval(f);
+        }
+    }, 100);
+}
+
+function fadeOut(audio, speed = 0.02){
+    let f = setInterval(()=>{
+        if(audio.volume > 0){
+            audio.volume -= speed;
+        }else{
+            audio.volume = 0;
+            audio.pause();
+            audio.currentTime = 0;
+            clearInterval(f);
+        }
+    }, 100);
+}
+
+function detenerTodos(){
+    fadeOut(audioInicio);
+    fadeOut(audioPoemas);
+    fadeOut(audioOceano);
+}
+
+
 
 /* ==========================================
    ESTADOS
@@ -198,6 +262,10 @@ function actualizarContador(){
 ========================================== */
 
 function iniciar(){
+
+    detenerTodos();
+    fadeIn(audioPoemas, 0.5);
+   
     screenInicio.classList.remove("active");
     screenScene.classList.add("active");
 
@@ -246,8 +314,10 @@ function drawFade(){
         // Activar fondo final (CSS)
         screenScene.classList.add("final");
 
-        // Sonido del mar
-        audioOlas.play();
+        // Música del océano (playlist)
+        detenerTodos();
+        fadeIn(audioOceano, 0.6);
+
     }
 }
 
@@ -384,8 +454,8 @@ function animar(){
     drawFade();
 }
 
-
-
-
+window.addEventListener("load", () => {
+    fadeIn(audioInicio, 0.4);
+});
 
 
