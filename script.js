@@ -245,33 +245,59 @@ function escribirPoema(el, texto, velocidad, callback){
    SUBTÍTULOS – EFECTO PROGRESIVO
 ========================================== */
 
+/* ==========================================
+   SUBTÍTULOS – APARECER Y DESAPARECER
+========================================== */
+
 let intervaloSubtitulos;
+let intervaloBorrado;
 
-function escribirSubtitulos(texto, velocidad = 35){
+function escribirSubtitulos(texto, velocidadEscritura = 35, tiempoVisible = 2000, velocidadBorrado = 20){
 
-    // Fade out
-    subtitulos.style.opacity = 0;
+    clearInterval(intervaloSubtitulos);
+    clearInterval(intervaloBorrado);
 
-    setTimeout(()=>{
+    subtitulos.style.opacity = 1;
+    subtitulos.innerHTML = "";
 
-        subtitulos.innerHTML = "";
-        subtitulos.style.opacity = 1;
+    let i = 0;
 
-        let i = 0;
-        clearInterval(intervaloSubtitulos);
+    // ESCRIBIR
+    intervaloSubtitulos = setInterval(()=>{
 
-        intervaloSubtitulos = setInterval(()=>{
+        subtitulos.innerHTML += texto[i];
+        i++;
 
-            subtitulos.innerHTML += texto[i];
-            i++;
+        if(i >= texto.length){
+            clearInterval(intervaloSubtitulos);
 
-            if(i >= texto.length){
-                clearInterval(intervaloSubtitulos);
-            }
+            // Mantener visible un momento
+            setTimeout(()=>{
 
-        }, velocidad);
+                let contenido = subtitulos.innerHTML;
 
-    }, 800);
+                // BORRAR letra por letra
+                intervaloBorrado = setInterval(()=>{
+
+                    contenido = contenido.slice(0, -1);
+                    subtitulos.innerHTML = contenido;
+
+                    if(contenido.length === 0){
+                        clearInterval(intervaloBorrado);
+
+                        // Repetir ciclo mientras la canción sigue
+                        if(estado === "final"){
+                            escribirSubtitulos(texto, velocidadEscritura, tiempoVisible, velocidadBorrado);
+                        }
+
+                    }
+
+                }, velocidadBorrado);
+
+            }, tiempoVisible);
+        }
+
+    }, velocidadEscritura);
 }
 
 /* ==========================================
@@ -426,6 +452,7 @@ function animar(){
         drawOcean();
     }
 }
+
 
 
 
