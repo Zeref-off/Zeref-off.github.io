@@ -60,4 +60,33 @@ left:20px;
 font-size:15px;
 }
 
+/* ==========================================
+   FONDO CINEMATOGRÁFICO – SEGUNDA PESTAÑA
+========================================== */
+
+#screenScene{
+    background: 
+        linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.65)),
+        url("lotos.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+/* Canvas de nieve encima del fondo */
+#sceneCanvas{
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+
+/* Textos por encima del canvas */
+.poema{
+    z-index: 2;
+}
+
+#contador{
+    z-index: 2;
+}
 
