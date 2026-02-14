@@ -225,13 +225,20 @@ function drawFade(){
         fadeOut = false;
         fadeAlpha = 0;
 
-        poemaLeft.style.display="none";
-        poemaRight.style.display="none";
-        contadorEl.style.display="none";
+        // Ocultar elementos de la segunda escena
+        poemaLeft.style.display = "none";
+        poemaRight.style.display = "none";
+        contadorEl.style.display = "none";
 
+        // 🔹 CAMBIO IMPORTANTE:
+        // Activar fondo final (CSS)
+        screenScene.classList.add("final");
+
+        // Sonido del mar
         audioOlas.play();
     }
 }
+
 
 /* ==========================================
    OCEANO PREMIUM (más partículas)
@@ -274,35 +281,29 @@ function ola(p, t){
     return p.baseY + (w1 + w2*0.6 + w3*0.3)*p.amp;
 }
 
-/* ==========================================
-   FONDO IMAGEN FINAL
-========================================== */
-const fondoFinal = new Image();
-fondoFinal.src = "fondo_final.jpg";
-
 
 function drawCielo(){
 
-    // Dibujar imagen de fondo
-    if(fondoFinal.complete){
-        ctx.drawImage(fondoFinal, 0, 0, W, H);
-    }else{
-        // Fondo negro mientras carga
-        ctx.fillStyle = "#000";
-        ctx.fillRect(0,0,W,H);
-    }
+    // Cielo nocturno suave (sin imagen, el fondo lo pone el CSS)
+    let grad = ctx.createLinearGradient(0,0,0,H);
+    grad.addColorStop(0,"rgba(0,8,20,0.6)");
+    grad.addColorStop(1,"rgba(0,17,31,0.8)");
 
-    // Luna (se mantiene igual)
+    ctx.fillStyle = grad;
+    ctx.fillRect(0,0,W,H);
+
+    // Luna con brillo
     let moonX = W * 0.8;
     let moonY = H * 0.15;
 
-    let glow = ctx.createRadialGradient(moonX, moonY, 0, moonX, moonY, 120);
-    glow.addColorStop(0,"rgba(255,255,220,0.7)");
+    let glow = ctx.createRadialGradient(moonX, moonY, 0, moonX, moonY, 140);
+    glow.addColorStop(0,"rgba(255,255,220,0.8)");
+    glow.addColorStop(0.4,"rgba(255,255,220,0.4)");
     glow.addColorStop(1,"rgba(255,255,220,0)");
 
     ctx.fillStyle = glow;
     ctx.beginPath();
-    ctx.arc(moonX, moonY, 120, 0, Math.PI*2);
+    ctx.arc(moonX, moonY, 140, 0, Math.PI*2);
     ctx.fill();
 
     ctx.fillStyle="#fff8cc";
@@ -370,6 +371,7 @@ function animar(){
 
     drawFade();
 }
+
 
 
 
