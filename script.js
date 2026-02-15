@@ -1,6 +1,7 @@
 /* ==========================================
    FATUM AMANTIS – CINE PREMIUM SECUENCIAL
 ========================================== */
+const screenHeart = document.getElementById("screenHeart");
 const subtitulos = document.getElementById("subtitulos");
 const screenInicio = document.getElementById("screenInicio");
 const screenScene = document.getElementById("screenScene");
@@ -461,8 +462,14 @@ function iniciarSubtitulosCancion(indice){
 
 // Playlist en bucle
 audioOceano.addEventListener("ended", () => {
+
     indiceOceano++;
-    if(indiceOceano >= playlistOceano.length) indiceOceano = 0;
+
+    // Si terminó la última canción → mostrar corazón
+    if(indiceOceano >= playlistOceano.length){
+        mostrarEscenaCorazon();
+        return;
+    }
 
     audioOceano.src = playlistOceano[indiceOceano];
     audioOceano.play();
@@ -548,27 +555,41 @@ function drawSnow(){
    POEMAS
 ========================================== */
 
-const texto1 = `AMO ELEGIRTE
-Tantas almas magicas en este mundo,
-pero es la tuya la unica que quiero,
-es tu sonrisa la que acelera mis
-latidos y es tu mano la que siempre
-deseo sujetar.
-Es a tu lado donde siento que todo
-tiene sentido y se tambien que eres
-tu mi mas bonita decision.`;
+const texto1 = `​El día que el destino se detuvo
+​Me rendí al silencio justo el día en que llegaste,
+pensando que serías un rostro más entre la gente,
+una historia fugaz que el tiempo borraría.
+Pero el destino, cansado de verme andar a oscuras
+bajo la lluvia de mis días más tristes,
+decidió encender todas sus luces para guiarme a ti.
+​Aquellas noches de desvelo no eran falta de sueño,
+eran la falta de tu risa, de tu voz y de tu vida.
+Desde entonces, mis sombras se volvieron amaneceres
+porque tú eres la luz que me sostiene en la frustración,
+el faro que me guía cuando el camino se pierde.
+​Aprendí que mi corazón no late, sino que te nombra,
+y que estos momentos, tan fugaces y a la vez eternos,
+son la melodía que se quedó grabada en mi alma.
+Hoy te amo con una intensidad que no entiende de distancias,
+y te amaría con la misma fuerza en cada vida,
+en cada reencuentro que el universo nos conceda.`;
 
-const texto2 = `Me enamore de ti desde 
-aquel instante en que llegaste a mi vida 
-sin previo aviso cuando ni siquiera 
-imaginaba que alguien tan especial como 
-tu apareceria y es que contigo aprendi 
-que el amor no se busca simplemente llega
-y te transforma, desde el primer dia supe 
-que habia algo distinto en ti, algo que te
-hacia brillar mas que a las demas, algo
-que me atrapo y me hizo sentir que eras
-tu lo que siempre habia estado esperando`;
+const texto2 = `O es contigo, o con nadie
+​Si alguna vez olvidas lo magnifica que eres,
+te prestaré mis ojos para que veas lo que yo veo:
+una mujer que inspira mi versión más noble,
+el sueño que se hizo realidad por fin.
+​Mi amor por ti no depende del tiempo ni del espacio,
+es un sentimiento libre, eterno y profundamente tuyo.
+Me niego a buscarte en otros rostros o en otras vidas,
+pues ya no sé caminar si no es hacia tu encuentro.
+Lo tengo claro: o es contigo, o prefiero la soledad,
+porque nadie más tiene el idioma de tu alma.
+​Gracias por enseñarme que amar es también entrega,
+por sostenerme los sueños con la misma fe que yo.
+Contigo aprendí que lo imposible no existe
+siempre y cuando sea tu mano la que sostenga la mía.
+Te amo hoy, y te amaré en cada latido que me quede`;
 
 function escribirPoema(el, texto, velocidad, callback){
     el.style.opacity = 1;
@@ -768,6 +789,31 @@ function animar(){
         drawCielo();
         drawOcean();
     }
+}
+
+/* ==========================================
+   ESCENA FINAL – CORAZÓN
+========================================== */
+
+function mostrarEscenaCorazon(){
+
+    estado = "heart";
+
+    // Ocultar escena del océano
+    screenScene.classList.remove("active");
+
+    // Mostrar nueva pantalla
+    if(screenHeart){
+        screenHeart.classList.add("active");
+    }
+
+    // Ocultar subtítulos
+    if(subtitulos){
+        subtitulos.style.opacity = 0;
+    }
+
+    // Detener audio
+    audioOceano.pause();
 }
 
 
