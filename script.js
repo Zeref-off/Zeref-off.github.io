@@ -425,10 +425,10 @@ function escribirLineaSubtitulo(texto, callback){
                     }
                 }, 18);
 
-            }, 2500);
+            }, 2200);
         }
 
-    }, 60);
+    }, 50);
 }
 
 function iniciarSubtitulosCancion(indice){
@@ -769,6 +769,7 @@ function animar(){
         drawOcean();
     }
 }
+
 
 
 
