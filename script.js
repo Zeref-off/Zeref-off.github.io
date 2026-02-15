@@ -480,7 +480,7 @@ audioOceano.addEventListener("ended", () => {
 
 // Transiciones automáticas
 audioInicio.addEventListener("ended", pasarAPoemas);
-audioPoemas.addEventListener("ended", pasarAFinal);
+//audioPoemas.addEventListener("ended", pasarAFinal);
 
 /* ==========================================
    ESTADOS
@@ -642,8 +642,15 @@ function pasarAPoemas(){
     crearOceano();
 
     escribirPoema(poemaLeft, texto1, 60, ()=>{
-        escribirPoema(poemaRight, texto2, 60);
+    escribirPoema(poemaRight, texto2, 60, ()=>{
+
+        // Esperar 5 segundos después de terminar el último poema
+        setTimeout(()=>{
+            pasarAFinal();
+        }, 5000);
+
     });
+});
 
     animar();
 }
@@ -815,6 +822,7 @@ function mostrarEscenaCorazon(){
     // Detener audio
     audioOceano.pause();
 }
+
 
 
 
