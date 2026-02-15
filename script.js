@@ -424,7 +424,7 @@ function escribirLineaSubtitulo(texto, callback){
                         clearInterval(intervaloBorrado);
                         if(callback) callback();
                     }
-                }, 18);
+                }, 12);
 
             }, 2200);
         }
@@ -815,6 +815,7 @@ function mostrarEscenaCorazon(){
     // Detener audio
     audioOceano.pause();
 }
+
 
 
 
