@@ -1,10 +1,10 @@
 /* ==========================================
    FATUM AMANTIS – CINE PREMIUM SECUENCIAL
+   + CUARTA SECCIÓN: CORAZÓN NEÓN
 ========================================== */
-const screenHeart = document.getElementById("screenHeart");
-const subtitulos = document.getElementById("subtitulos");
 const screenInicio = document.getElementById("screenInicio");
 const screenScene = document.getElementById("screenScene");
+const screenHeartNeon = document.getElementById("screenHeartNeon");
 const startBox = document.getElementById("startBox");
 
 const matrixCanvas = document.getElementById("matrixCanvas");
@@ -16,11 +16,11 @@ const ctx = canvas.getContext("2d");
 const poemaLeft = document.getElementById("poemaLeft");
 const poemaRight = document.getElementById("poemaRight");
 const contadorEl = document.getElementById("contador");
+const subtitulos = document.getElementById("subtitulos");
 
 /* ==========================================
    SIZE
 ========================================== */
-
 let W, H;
 function resize(){
     W = window.innerWidth;
@@ -29,6 +29,13 @@ function resize(){
     canvas.height = H;
     matrixCanvas.width = W;
     matrixCanvas.height = H;
+    
+    // Redimensionar canvas del corazón neón si existe
+    const heartCanvas = document.getElementById("heartNeonCanvas");
+    if(heartCanvas){
+        heartCanvas.width = W;
+        heartCanvas.height = H;
+    }
 }
 window.addEventListener("resize", resize);
 resize();
@@ -36,14 +43,10 @@ resize();
 /* ==========================================
    AUDIO SECUENCIAL
 ========================================== */
-
-// Escena 1
 const audioInicio = new Audio("inicio.mp3");
-
-// Escena 2
 const audioPoemas = new Audio("poemas.mp3");
 
-// Escena 3 (playlist)
+// Playlist océano
 const playlistOceano = [
     "oceano1.mp3",
     "oceano2.mp3",
@@ -55,10 +58,13 @@ const playlistOceano = [
 let indiceOceano = 0;
 const audioOceano = new Audio(playlistOceano[indiceOceano]);
 
+// Audio para la cuarta sección - se reproduce UNA SOLA VEZ
+const audioHeartNeon = new Audio("corazon_neon.mp3"); // Cambia este nombre por tu archivo
+audioHeartNeon.loop = false; // Aseguramos que no se repita
+
 /* ==========================================
    SUBTÍTULOS OCEANO (SECUENCIALES)
 ========================================== */
-
 const subtitulosCanciones = [
     // Canción 1
     [
@@ -120,7 +126,6 @@ const subtitulosCanciones = [
         "Convierte su amor en su vida,",
         "su comida y bebida en la justa medida..."
     ],
-
     // Canción 2
     [
         "",
@@ -225,7 +230,6 @@ const subtitulosCanciones = [
         "Mi unico sueño es sobre tu y yo",
         ""
     ],
-
     // Canción 3
     [
         "Dije ooh-ooh",
@@ -291,7 +295,6 @@ const subtitulosCanciones = [
         "",
         ""
     ],
-
     // Canción 4
     [
         "",
@@ -385,7 +388,6 @@ const subtitulosCanciones = [
         "",
         ""
     ]
-
     // Canción 5 → sin subtítulos
 ];
 
@@ -394,7 +396,6 @@ let intervaloBorrado;
 let indiceLinea = 0;
 
 function escribirLineaSubtitulo(texto, callback){
-
     clearInterval(intervaloEscritura);
     clearInterval(intervaloBorrado);
 
@@ -403,7 +404,6 @@ function escribirLineaSubtitulo(texto, callback){
 
     let i = 0;
 
-    // Escribir
     intervaloEscritura = setInterval(()=>{
         subtitulos.innerHTML += texto[i];
         i++;
@@ -411,9 +411,7 @@ function escribirLineaSubtitulo(texto, callback){
         if(i >= texto.length){
             clearInterval(intervaloEscritura);
 
-            // Pausa antes de borrar
             setTimeout(()=>{
-
                 let contenido = subtitulos.innerHTML;
 
                 intervaloBorrado = setInterval(()=>{
@@ -424,17 +422,13 @@ function escribirLineaSubtitulo(texto, callback){
                         clearInterval(intervaloBorrado);
                         if(callback) callback();
                     }
-                }, 12);
-
+                }, 18);
             }, 2200);
         }
-
     }, 50);
 }
 
 function iniciarSubtitulosCancion(indice){
-
-    // Canción 5 o fuera de rango → ocultar
     if(indice >= subtitulosCanciones.length){
         subtitulos.style.opacity = 0;
         return;
@@ -444,10 +438,7 @@ function iniciarSubtitulosCancion(indice){
     indiceLinea = 0;
 
     function siguiente(){
-
-        // Seguridad: si cambió de canción, detener
         if(indiceOceano !== indice) return;
-
         if(indiceLinea >= lineas.length) return;
 
         escribirLineaSubtitulo(lineas[indiceLinea], ()=>{
@@ -455,43 +446,33 @@ function iniciarSubtitulosCancion(indice){
             siguiente();
         });
     }
-
     siguiente();
 }
 
-
-// Playlist en bucle
+// Playlist - CORREGIDO para pasar a la cuarta sección después de la quinta canción
 audioOceano.addEventListener("ended", () => {
-
-    indiceOceano++;
-
-    // Si terminó la última canción → mostrar corazón
-    if(indiceOceano >= playlistOceano.length){
-        mostrarEscenaCorazon();
+    // Si estamos en la última canción (índice 4 = quinta canción)
+    if(indiceOceano === 4) {
+        // Pasar directamente al corazón neón sin reproducir más canciones
+        pasarACorazonNeon();
         return;
     }
-
+    
+    // Si no es la última canción, avanzar a la siguiente
+    indiceOceano++;
     audioOceano.src = playlistOceano[indiceOceano];
     audioOceano.play();
-
     iniciarSubtitulosCancion(indiceOceano);
 });
 
-
-// Transiciones automáticas
-audioInicio.addEventListener("ended", pasarAPoemas);
-//audioPoemas.addEventListener("ended", pasarAFinal);
-
 /* ==========================================
-   ESTADOS
+   TRANSICIONES
 ========================================== */
-
-let estado = "inicio"; // inicio → poemas → final
+let estado = "inicio"; // inicio → poemas → final → heartneon
 
 /* ==========================================
    MATRIX
 ========================================== */
-
 const matrixText = "Fatum Amantis";
 const fontSize = 22;
 let cols = Math.floor(W / fontSize);
@@ -521,7 +502,6 @@ setInterval(drawMatrix, 60);
 /* ==========================================
    NIEVE
 ========================================== */
-
 let snow = [];
 
 function initSnow(){
@@ -554,8 +534,7 @@ function drawSnow(){
 /* ==========================================
    POEMAS
 ========================================== */
-
-const texto1 = `​El día que el destino se detuvo
+const texto1 = `​El día que el destino se detuvo 
 ​Me rendí al silencio justo el día en que llegaste,
 pensando que serías un rostro más entre la gente,
 una historia fugaz que el tiempo borraría.
@@ -574,11 +553,11 @@ Hoy te amo con una intensidad que no entiende de distancias,
 y te amaría con la misma fuerza en cada vida,
 en cada reencuentro que el universo nos conceda.`;
 
-const texto2 = `O es contigo, o con nadie
+const texto2 = `O es contigo, o con nadie 
 ​Si alguna vez olvidas lo magnifica que eres,
 te prestaré mis ojos para que veas lo que yo veo:
 una mujer que inspira mi versión más noble,
-el sueño que se hizo realidad por fin.
+el sueño que se hizo realidad por fin. 
 ​Mi amor por ti no depende del tiempo ni del espacio,
 es un sentimiento libre, eterno y profundamente tuyo.
 Me niego a buscarte en otros rostros o en otras vidas,
@@ -610,13 +589,8 @@ function escribirPoema(el, texto, velocidad, callback){
 /* ==========================================
    INICIAR (BOTÓN)
 ========================================== */
-
 function iniciar(){
-
-    // Oculta solo el botón
     startBox.style.display = "none";
-
-    // Reproducir música de la primera escena
     audioInicio.currentTime = 0;
     audioInicio.volume = 0.6;
     audioInicio.play().catch(()=>{});
@@ -624,13 +598,10 @@ function iniciar(){
 window.iniciar = iniciar;
 
 /* ==========================================
-   TRANSICIONES
+   TRANSICIÓN A POEMAS
 ========================================== */
-
 function pasarAPoemas(){
-
     estado = "poemas";
-
     screenInicio.classList.remove("active");
     screenScene.classList.add("active");
 
@@ -642,27 +613,26 @@ function pasarAPoemas(){
     crearOceano();
 
     escribirPoema(poemaLeft, texto1, 60, ()=>{
-    escribirPoema(poemaRight, texto2, 60, ()=>{
-
-        // Esperar 5 segundos después de terminar el último poema
-        setTimeout(()=>{
-            pasarAFinal();
-        }, 5000);
-
+        escribirPoema(poemaRight, texto2, 60, ()=>{
+            setTimeout(()=>{
+                pasarAFinal();
+            }, 5000);
+        });
     });
-});
 
     animar();
 }
 
+audioInicio.addEventListener("ended", pasarAPoemas);
+
+/* ==========================================
+   TRANSICIÓN A FINAL (OCÉANO)
+========================================== */
 function pasarAFinal(){
-
     estado = "final";
-
     poemaLeft.style.display = "none";
     poemaRight.style.display = "none";
     contadorEl.style.display = "none";
-
     screenScene.classList.add("final");
 
     indiceOceano = 0;
@@ -675,9 +645,36 @@ function pasarAFinal(){
 }
 
 /* ==========================================
+   TRANSICIÓN A CORAZÓN NEÓN (CUARTA SECCIÓN)
+========================================== */
+function pasarACorazonNeon(){
+    estado = "heartneon";
+    
+    // Detener audio del océano
+    audioOceano.pause();
+    audioOceano.currentTime = 0;
+    
+    // Ocultar pantalla del océano y mostrar corazón neón
+    screenScene.classList.remove("active");
+    screenHeartNeon.classList.add("active");
+    
+    // Reproducir audio del corazón neón (UNA SOLA VEZ)
+    if(audioHeartNeon){
+        audioHeartNeon.pause();
+        audioHeartNeon.currentTime = 0;
+        audioHeartNeon.volume = 0.6;
+        audioHeartNeon.play().catch(()=>{
+            console.log("No se pudo reproducir el audio de la cuarta sección");
+        });
+    }
+    
+    // Inicializar la animación del corazón neón
+    initHeartNeon();
+}
+
+/* ==========================================
    OCEANO CINEMATOGRÁFICO ORIGINAL
 ========================================== */
-
 let particulas = [];
 let tiempo = 0;
 let camX = 0;
@@ -689,7 +686,6 @@ function crearOceano(){
     const capas = 7;
 
     for(let c = 0; c < capas; c++){
-
         let profundidad = c / capas;
         let cantidad = 500 + c * 250;
 
@@ -716,7 +712,6 @@ function ola(p, t){
 }
 
 function drawCielo(){
-
     let grad = ctx.createLinearGradient(0,0,0,H);
     grad.addColorStop(0,"rgba(0,8,20,0.6)");
     grad.addColorStop(1,"rgba(0,17,31,0.8)");
@@ -744,7 +739,6 @@ function drawCielo(){
 }
 
 function drawOcean(){
-
     camX = Math.sin(tiempo*0.15)*18;
     camY = Math.sin(tiempo*0.12)*8;
 
@@ -752,7 +746,6 @@ function drawOcean(){
     ctx.translate(camX, camY);
 
     for(let p of particulas){
-
         let y = ola(p, tiempo);
 
         p.x += p.profundidad*0.4;
@@ -779,9 +772,368 @@ function drawOcean(){
 }
 
 /* ==========================================
-   LOOP
+   CUARTA SECCIÓN - CORAZÓN NEÓN (PROYECTO 2)
 ========================================== */
+let heartNeon = {
+    particles: [],
+    sparks: [],
+    heartPath: [],
+    phase: "float",
+    pathIndex: 0,
+    releaseIndex: 0,
+    hue: 0,
+    holdTimer: 0,
+    floatTimer: 0,
+    FLOAT_COUNT: 900,
+    FLOAT_DELAY: 240,
+    textoVisible: false,
+    textoOpacity: 0
+};
 
+let heartCtx;
+let heartCanvas;
+let heartNeonAnimationFrame;
+
+// Texto para mostrar en el centro
+const textoCorazon = `Este no es el final, ven y dejame enseñarte: no solo 
+representas a quien por tanto tiempo espere. Eres la pieza faltante que, sin 
+previo aviso, llego a mi vida para completar mi ecuacion de Dirac.
+Ahora, sin importar la distancia o el espacio que nos separe, sé que estamos 
+entrelazados; que mi alma siempre vibrará en tu misma frecuencia y que, 
+incluso en el silencio, seguiremos siendo uno solo.`;
+
+function initHeartNeon(){
+    heartCanvas = document.getElementById("heartNeonCanvas");
+    if(!heartCanvas) return;
+    
+    heartCtx = heartCanvas.getContext("2d");
+    heartCanvas.width = W;
+    heartCanvas.height = H;
+    
+    // Reiniciar estado completamente
+    heartNeon = {
+        particles: [],
+        sparks: [],
+        heartPath: [],
+        phase: "float",
+        pathIndex: 0,
+        releaseIndex: 0,
+        hue: 0,
+        holdTimer: 0,
+        floatTimer: 0,
+        FLOAT_COUNT: 900,
+        FLOAT_DELAY: 240,
+        textoVisible: false,
+        textoOpacity: 0
+    };
+    
+    createHeartNeonParticles();
+    createHeartNeonPath();
+    
+    // Cancelar cualquier animación anterior
+    if(heartNeonAnimationFrame) {
+        cancelAnimationFrame(heartNeonAnimationFrame);
+    }
+    
+    // Iniciar la animación
+    animateHeartNeon();
+}
+
+function createHeartNeonParticles(){
+    for(let i = 0; i < heartNeon.FLOAT_COUNT; i++){
+        heartNeon.particles.push({
+            x: Math.random() * W,
+            y: Math.random() * H,
+            vx: (Math.random() - 0.5) * 0.4,
+            vy: (Math.random() - 0.5) * 0.4,
+            size: 2 + Math.random() * 2,
+            locked: false,
+            assigned: false
+        });
+    }
+}
+
+function createHeartNeonPath(){
+    heartNeon.heartPath = [];
+    const scale = Math.min(W, H) / 40;
+    const cx = W / 2;
+    const cy = H / 2;
+
+    for(let t = 0; t < Math.PI * 2; t += 0.01){
+        let x = 16 * Math.pow(Math.sin(t), 3);
+        let y = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+
+        heartNeon.heartPath.push({
+            x: cx + x * scale,
+            y: cy + y * scale,
+            particle: null
+        });
+    }
+
+    // Encontrar el punto más alto para comenzar desde ahí
+    let topIndex = 0;
+    for(let i = 1; i < heartNeon.heartPath.length; i++){
+        if(heartNeon.heartPath[i].y < heartNeon.heartPath[topIndex].y){
+            topIndex = i;
+        }
+    }
+
+    heartNeon.heartPath = heartNeon.heartPath.slice(topIndex).concat(heartNeon.heartPath.slice(0, topIndex));
+}
+
+function drawHeartNeonShape(x, y, size, color, glow = 1){
+    if(!heartCtx) return;
+    
+    heartCtx.save();
+    heartCtx.translate(x, y);
+    heartCtx.scale(size / 5, size / 5);
+
+    heartCtx.beginPath();
+    heartCtx.moveTo(0, 0);
+    heartCtx.bezierCurveTo(0, -3, -5, -3, -5, 0);
+    heartCtx.bezierCurveTo(-5, 3, 0, 5, 0, 8);
+    heartCtx.bezierCurveTo(0, 5, 5, 3, 5, 0);
+    heartCtx.bezierCurveTo(5, -3, 0, -3, 0, 0);
+
+    heartCtx.shadowBlur = 15 * glow;
+    heartCtx.shadowColor = color;
+    heartCtx.fillStyle = color;
+    heartCtx.fill();
+    heartCtx.restore();
+}
+
+function getFreeHeartNeonParticle(x, y){
+    let minDist = 999999;
+    let chosen = null;
+
+    heartNeon.particles.forEach(p => {
+        if(!p.assigned){
+            let dx = p.x - x;
+            let dy = p.y - y;
+            let d = dx * dx + dy * dy;
+            if(d < minDist){
+                minDist = d;
+                chosen = p;
+            }
+        }
+    });
+
+    if(chosen){
+        chosen.assigned = true;
+        chosen.locked = true;
+    }
+
+    return chosen;
+}
+
+function createHeartNeonSpark(x, y, color){
+    heartNeon.sparks.push({
+        x, y,
+        vx: (Math.random() - 0.5) * 2,
+        vy: (Math.random() - 1) * 2,
+        life: 1,
+        color
+    });
+}
+
+function updateHeartNeonSparks(){
+    for(let i = heartNeon.sparks.length - 1; i >= 0; i--){
+        let s = heartNeon.sparks[i];
+        s.x += s.vx;
+        s.y += s.vy;
+        s.vy += 0.05;
+        s.life -= 0.02;
+        if(s.life <= 0) heartNeon.sparks.splice(i, 1);
+    }
+}
+
+function updateHeartNeon(){
+    if(!heartNeon) return;
+    
+    heartNeon.hue += 0.5;
+    if(heartNeon.hue > 360) heartNeon.hue = 0;
+    const color = `hsl(${heartNeon.hue},100%,60%)`;
+
+    // Movimiento flotante
+    heartNeon.particles.forEach(p => {
+        if(!p.locked){
+            p.x += p.vx;
+            p.y += p.vy;
+
+            if(p.x < 0 || p.x > W) p.vx *= -1;
+            if(p.y < 0 || p.y > H) p.vy *= -1;
+        }
+    });
+
+    // FASE FLOAT
+    if(heartNeon.phase === "float"){
+        heartNeon.floatTimer++;
+        heartNeon.textoVisible = false;
+        heartNeon.textoOpacity = 0;
+
+        if(heartNeon.floatTimer > heartNeon.FLOAT_DELAY){
+            heartNeon.floatTimer = 0;
+            heartNeon.pathIndex = 0;
+            heartNeon.phase = "forming";
+        }
+    }
+
+    // FORMACIÓN
+    if(heartNeon.phase === "forming"){
+        heartNeon.pathIndex += 2;
+        heartNeon.textoVisible = false;
+        heartNeon.textoOpacity = 0;
+
+        if(heartNeon.pathIndex < heartNeon.heartPath.length){
+            let point = heartNeon.heartPath[Math.floor(heartNeon.pathIndex)];
+
+            if(!point.particle){
+                point.particle = getFreeHeartNeonParticle(point.x, point.y);
+            }
+
+            createHeartNeonSpark(point.x, point.y, color);
+        }
+        else{
+            heartNeon.phase = "hold";
+            heartNeon.holdTimer = 0;
+        }
+    }
+
+    // HOLD - El texto aparece cuando el corazón está completo
+    if(heartNeon.phase === "hold"){
+        heartNeon.holdTimer++;
+        heartNeon.textoVisible = true;
+        if(heartNeon.textoOpacity < 1) {
+            heartNeon.textoOpacity += 0.01;
+        }
+
+        if(heartNeon.holdTimer > 120){
+            heartNeon.phase = "releasing";
+            heartNeon.releaseIndex = 0;
+        }
+    }
+
+    // DESINTEGRACIÓN - El texto permanece visible
+    if(heartNeon.phase === "releasing"){
+        heartNeon.releaseIndex += 2;
+        heartNeon.textoVisible = true;
+        heartNeon.textoOpacity = 1;
+
+        if(heartNeon.releaseIndex < heartNeon.heartPath.length){
+            let point = heartNeon.heartPath[Math.floor(heartNeon.releaseIndex)];
+
+            if(point.particle){
+                let p = point.particle;
+                p.locked = false;
+                p.assigned = false;
+                p.vx = (Math.random() - 0.5) * 1.2;
+                p.vy = (Math.random() - 0.5) * 1.2;
+                point.particle = null;
+                createHeartNeonSpark(point.x, point.y, color);
+            }
+        }
+        else{
+            heartNeon.textoVisible = false;
+            heartNeon.textoOpacity = 0;
+            heartNeon.phase = "float";
+        }
+    }
+
+    // Mover partículas asignadas
+    heartNeon.heartPath.forEach(point => {
+        if(point.particle){
+            let p = point.particle;
+            p.x += (point.x - p.x) * 0.12;
+            p.y += (point.y - p.y) * 0.12;
+        }
+    });
+
+    updateHeartNeonSparks();
+}
+
+function drawHeartNeon(){
+    if(!heartCtx || !heartNeon) return;
+    
+    heartCtx.clearRect(0, 0, W, H);
+    const color = `hsl(${heartNeon.hue},100%,60%)`;
+
+    // Dibujar partículas
+    heartNeon.particles.forEach(p => {
+        drawHeartNeonShape(p.x, p.y, p.size, color, 1);
+    });
+
+    // Dibujar chispas
+    heartNeon.sparks.forEach(s => {
+        heartCtx.globalAlpha = s.life;
+        heartCtx.shadowBlur = 10;
+        heartCtx.shadowColor = s.color;
+        heartCtx.fillStyle = s.color;
+        heartCtx.fillRect(s.x, s.y, 2, 2);
+    });
+    heartCtx.globalAlpha = 1;
+
+    // Esfera sincronizada - forming
+    if(heartNeon.phase === "forming"){
+        let point = heartNeon.heartPath[Math.floor(heartNeon.pathIndex)];
+        if(point){
+            heartCtx.beginPath();
+            heartCtx.arc(point.x, point.y, 4, 0, Math.PI * 2);
+            heartCtx.fillStyle = color;
+            heartCtx.shadowBlur = 25;
+            heartCtx.shadowColor = color;
+            heartCtx.fill();
+        }
+    }
+
+    // Esfera sincronizada - releasing
+    if(heartNeon.phase === "releasing"){
+        let point = heartNeon.heartPath[Math.floor(heartNeon.releaseIndex)];
+        if(point){
+            heartCtx.beginPath();
+            heartCtx.arc(point.x, point.y, 4, 0, Math.PI * 2);
+            heartCtx.fillStyle = color;
+            heartCtx.shadowBlur = 25;
+            heartCtx.shadowColor = color;
+            heartCtx.fill();
+        }
+    }
+
+    // Dibujar texto
+    if(heartNeon.textoVisible || heartNeon.textoOpacity > 0) {
+        heartCtx.save();
+        heartCtx.font = 'bold 16px "Arial", "Helvetica", sans-serif';
+        heartCtx.textAlign = 'center';
+        heartCtx.textBaseline = 'middle';
+        heartCtx.fillStyle = `hsla(${heartNeon.hue}, 100%, 70%, ${heartNeon.textoOpacity})`;
+        heartCtx.shadowBlur = 20;
+        heartCtx.shadowColor = `hsl(${heartNeon.hue}, 100%, 60%)`;
+        
+        const lineas = textoCorazon.split('\n');
+        const centroX = W / 2;
+        const centroY = H / 2;
+        const lineHeight = 24;
+        const startY = centroY - (lineas.length * lineHeight) / 2;
+        
+        lineas.forEach((linea, index) => {
+            heartCtx.fillText(linea, centroX, startY + index * lineHeight);
+        });
+        
+        heartCtx.restore();
+    }
+}
+
+function animateHeartNeon(){
+    if(estado !== "heartneon") return;
+    
+    updateHeartNeon();
+    drawHeartNeon();
+    
+    heartNeonAnimationFrame = requestAnimationFrame(animateHeartNeon);
+}
+
+/* ==========================================
+   LOOP PRINCIPAL (para escenas 1-3)
+========================================== */
 function animar(){
     requestAnimationFrame(animar);
     tiempo += 0.01;
@@ -797,39 +1149,5 @@ function animar(){
         drawOcean();
     }
 }
-
-/* ==========================================
-   ESCENA FINAL – CORAZÓN
-========================================== */
-
-function mostrarEscenaCorazon(){
-
-    estado = "heart";
-
-    // Ocultar escena del océano
-    screenScene.classList.remove("active");
-
-    // Mostrar nueva pantalla
-    if(screenHeart){
-        screenHeart.classList.add("active");
-    }
-
-    // Ocultar subtítulos
-    if(subtitulos){
-        subtitulos.style.opacity = 0;
-    }
-
-    // Detener audio
-    audioOceano.pause();
-}
-
-
-
-
-
-
-
-
-
 
 
