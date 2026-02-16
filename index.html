@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -10,70 +9,37 @@
 <body>
 
 <!-- ================= PANTALLA DE INICIO ================= -->
-
 <div id="screenInicio" class="screen active">
-
-
-<!-- Fondo Matrix -->
-<canvas id="matrixCanvas"></canvas>
-
-<!-- Botón INICIAR -->
-<div id="startBox" onclick="iniciar()">
-    INICIAR
-</div>
-
-
+    <!-- Fondo Matrix -->
+    <canvas id="matrixCanvas"></canvas>
+    <!-- Botón INICIAR -->
+    <div id="startBox" onclick="iniciar()">INICIAR</div>
 </div>
 
 <!-- ================= ESCENA PRINCIPAL ================= -->
-
 <div id="screenScene" class="screen">
-
-<!-- Canvas principal donde ocurre toda la animación -->
-<canvas id="sceneCanvas"></canvas>
-
-<!-- Poema izquierdo -->
-<div id="poemaLeft" class="poema"></div>
-
-<!-- Poema derecho -->
-<div id="poemaRight" class="poema"></div>
-
-<!-- Contador -->
-<div id="contador">
-    Mi amor por ti empezó hace…<br>
-    <span id="time">24d 10h 5m 30s</span>
+    <!-- Canvas principal donde ocurre toda la animación -->
+    <canvas id="sceneCanvas"></canvas>
+    <!-- Poema izquierdo -->
+    <div id="poemaLeft" class="poema"></div>
+    <!-- Poema derecho -->
+    <div id="poemaRight" class="poema"></div>
+    <!-- Contador -->
+    <div id="contador">Mi amor por ti empezó hace…<br><span id="time">25d 10h 5m 30s</span></div>
+    <!-- Subtítulos del océano -->
+    <div id="subtitulos" class="subtitulos">Letra de la canción aparecerá aquí...</div>
 </div>
 
-<!-- Subtítulos del océano -->
-<div id="subtitulos" class="subtitulos">
-    Letra de la canción aparecerá aquí...
-</div>
-</div>
-
-<div id="screenHeart" class="screen">
-
-    <div id="heartContainer">
-
-        <div id="heart"></div>
-
-        <div id="heartText">
-            En un principio, fuiste mi tercera ley de Newton: la fuerza inesperada que me hizo reaccionar y me devolvió a la vida.<br><br>
-            Pero con el tiempo, te convertiste en mucho más que eso; pasaste a ser la pieza faltante de mi ecuación de Dirac.<br><br>
-            Ahora, sin importar la distancia o el espacio que nos separe, sé que estamos entrelazados y que mi alma siempre vibrará en la misma frecuencia que la tuya.<br><br>
-            Te amo en esta y en todas mis vidas.
-        </div>
-
-    </div>
-
+<!-- ================= CUARTA SECCIÓN - CORAZÓN NEÓN ================= -->
+<div id="screenHeartNeon" class="screen">
+    <canvas id="heartNeonCanvas"></canvas>
 </div>
 
 <!-- ================= SCRIPT ================= -->
-
 <script src="script.js"></script>
 
 </body>
 </html>
-
 
 
 
