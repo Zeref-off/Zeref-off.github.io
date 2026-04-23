@@ -20,7 +20,8 @@ const playlist = [
     "LAS_RATAS_DE_MASON16.mp4",
     "LAS_RATAS_DE_MASON17.mp4",
     "LAS_RATAS_DE_MASON18.mp4",
-    "LAS_RATAS_DE_MASON19.mp4"
+    "LAS_RATAS_DE_MASON19.mp4",
+    "LAS_RATAS_DE_MASON20.mp4"
 ];
 
 let index = 0;
