@@ -1,18 +1,47 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reproductor Secuencial</title>
-    <link rel="stylesheet" href="styles.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Películas</title>
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-<div class="video-container">
-    <video id="videoPlayer" controls>
-        <source src="LAS_RATAS_DE_MASON1.mp4" type="video/mp4">
-        Tu navegador no soporta video HTML5.
-    </video>
+<!-- FONDO -->
+<img id="background" src="img/fondo.jpg" style="
+position: fixed;
+top:0;
+left:0;
+width:100vw;
+height:100vh;
+object-fit:cover;
+z-index:-999;
+pointer-events:none;">
+
+<!-- PANTALLA INICIO -->
+<div id="homeScreen" class="screen active">
+    <h1 style="color:white;">Bienvenida</h1>
+    <p style="color:white;">Selecciona tu película</p>
+
+    <div class="grid">
+        <div class="card" data-movie="pelicula1" data-img="img/pelicula1.jpg">
+            <img src="img/pelicula1.jpg">
+        </div>
+
+        <div class="card" data-movie="pelicula2" data-img="img/pelicula2.jpg">
+            <img src="img/pelicula2.jpg">
+        </div>
+
+        <div class="card" data-movie="pelicula3" data-img="img/pelicula3.jpg">
+            <img src="img/pelicula3.jpg">
+        </div>
+    </div>
+</div>
+
+<!-- PANTALLA REPRODUCTOR -->
+<div id="playerScreen" class="screen">
+    <video id="videoPlayer"></video>
 </div>
 
 <script src="script.js"></script>
